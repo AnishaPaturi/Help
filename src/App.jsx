@@ -760,7 +760,8 @@ Step 6: Open VirusTotal → Paste URL → Check results`,
   {
     id: "password",
     title: "Password Strength Checker",
-    content: `import re
+    content: `Program 1: Simple Password Strength Checker
+import re
 def check_password_strength(password):
     if len(password) < 8:
         return "Weak: Password must be at least 8 characters long."
@@ -790,6 +791,81 @@ def password_checker():
 
         result = check_password_strength(password)
         print(result)
+
+if __name__ == "__main__":
+    password_checker()
+    
+    
+    Program 2: Password Strength Checker with confidence score
+    import re
+
+def check_password_strength(password):
+    score = 0
+    feedback = []
+
+    # Length check
+    if len(password) >= 8:
+        score += 20
+    else:
+        feedback.append("Password should be at least 8 characters long.")
+
+    # Digit check
+    if any(char.isdigit() for char in password):
+        score += 20
+    else:
+        feedback.append("Add at least one number.")
+
+    # Uppercase check
+    if any(char.isupper() for char in password):
+        score += 20
+    else:
+        feedback.append("Add at least one uppercase letter.")
+
+    # Lowercase check
+    if any(char.islower() for char in password):
+        score += 20
+    else:
+        feedback.append("Add at least one lowercase letter.")
+
+    # Special character check
+    if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        score += 20
+    else:
+        feedback.append("Add special characters for better security.")
+
+    # Strength level
+    if score == 100:
+        strength = "Strong"
+    elif score >= 60:
+        strength = "Medium"
+    else:
+        strength = "Weak"
+
+    return strength, score, feedback
+
+
+def password_checker():
+    print("Welcome to the Password Strength Checker!")
+
+    while True:
+        password = input("\nEnter your password (or type 'exit' to quit): ")
+
+        if password.lower() == "exit":
+            print("Thank you for using the Password Strength Checker! Goodbye!")
+            break
+
+        strength, score, feedback = check_password_strength(password)
+
+        print(f"\nPassword Strength: {strength}")
+        print(f"Confidence Score: {score}/100")
+
+        if feedback:
+            print("Suggestions to improve your password:")
+            for item in feedback:
+                print(f"- {item}")
+        else:
+            print("Excellent! Your password is very secure.")
+
 
 if __name__ == "__main__":
     password_checker()`,
