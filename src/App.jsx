@@ -608,34 +608,37 @@ Step 6: Open VirusTotal → Paste URL → Check results`,
   {
     id: "password",
     title: "Password Strength Checker",
-    content: `def check_password_strength(password):
+    content: `import re
+def check_password_strength(password):
+ if len(password) < 8:
+ return "Weak: Password must be at least 8 characters long."
 
-    has_digit   = False
-    has_upper   = False
-    has_lower   = False
-    has_special = False
+ if not any(char.isdigit() for char in password):
+ return "Weak: Password must include at least one number."
 
-    for ch in password:
-        if ch.isdigit():       has_digit   = True
-        elif ch.isupper():     has_upper   = True
-        elif ch.islower():     has_lower   = True
-        elif not ch.isalnum(): has_special = True
+ if not any(char.isupper() for char in password):
+ return "Weak: Password must include at least one uppercase letter."
 
-    conditions_met = sum([
-        len(password) >= 8,
-        has_digit,
-        has_upper,
-        has_lower,
-        has_special
-    ])
+ if not any(char.islower() for char in password):
+ return "Weak: Password must include at least one lowercase letter."
 
-    if conditions_met == 5:   return "Strong password"
-    elif conditions_met == 3: return "Medium password"
-    else:                     return "Weak password"
+ if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+ return "Medium: Add special characters to make your password stronger."
 
-password = input("Enter password: ")
-result = check_password_strength(password)
-print(result)`,
+ return "Strong: Your password is secure!"
+def password_checker():
+ print("Welcome to the Password Strength Checker!")
+ while True:
+ password = input("\nEnter your password (or type 'exit' to quit): ")
+
+ if password.lower() == "exit":
+ print("Thank you for using the Password Strength Checker! Goodbye!")
+ break
+
+ result = check_password_strength(password)
+ print(result)
+if __name__ == "__main__":
+ password_checker()`,
   },
   {
     id: "session-auth",
