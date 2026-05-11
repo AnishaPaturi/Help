@@ -883,162 +883,111 @@ if __name__ == "__main__":
     id: "session-hijack",
     title: "Session Hijacking",
     content: `Session Hijacking
-BEFORE YOU START
-DVWA security level = LOW
-You are logged in as admin in DVWA
-Step 1: Open DVWA (Victim Session)
-Open Firefox
-Go to:
-http://127.0.0.1/dvwa
-Login:
-Username: admin
-Password: password
-Stay logged in (do NOT logout)
-
-This browser is the Victim.
-
-Step 2: Copy the Session ID (PHPSESSID)
-Right click → Inspect
-Click Storage tab
-Click Cookies
-Select:
-http://127.0.0.1
-
-You will see:
-
-PHPSESSID a8c9f7e3d4b1...
-
-Copy the PHPSESSID value.
-
-This value is the session ID (user identity).
-
-Step 3: Open Attacker Browser (Private Window)
-
-Press:
-
-Ctrl + Shift + P
-
-Private Window opens.
-
-Do NOT login here.
-
-Step 4: Paste Session ID in Attacker Browser
-In Private Window, go to:
-http://127.0.0.1/dvwa
-Right click → Inspect
-Go to Storage → Cookies
-Replace PHPSESSID with copied value
-Press Enter
-Step 5: Refresh Page
-
-Refresh using:
-
-F5
-
-You are logged in as admin without username or password.
-
-Result
-
-Attacker gains access without login → Session Hijacking.
-
-Experiment 5: Session Fixation
-IMPORTANT CONDITIONS
-DVWA Security Level = LOW
-Use only ONE browser window
-Do NOT use Private Window
-Step 1: Open DVWA WITHOUT Login
-
-Go to:
-
-http://127.0.0.1/dvwa/
-
-Do NOT login.
-
-Step 2: Note the Session ID (Before Login)
-
-Inspect → Storage → Cookies → http://127.0.0.1
-
-Example:
-
-PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-Step 3: Login WITHOUT Closing Browser
-
-Enter:
-
-Username: admin
-Password: password
-
-Click Login.
-
-Step 4: Check Session ID AGAIN (After Login)
-
-Observe PHPSESSID carefully.
-
-Case 1 (VULNERABLE – DVWA LOW)
-Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-After Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-
-Same value → Session Fixation exists.
-
-Case 2 (SECURE – DVWA HIGH / IMPOSSIBLE)
-Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
-After Login PHPSESSID = be2d584526b42fef6742d5cf95ce008f
-
-Session regenerated → No session fixation.
-
-Experiment 6
-CONDITIONS
-DVWA Security Level = LOW
-Must know how to view cookies
-Step 1: Login Normally
-
-Go to:
-
-http://127.0.0.1/dvwa/
-
-Login using:
-
-Username: admin
-Password: password
-Step 2: Copy Session ID
-
-Inspect → Storage → Cookies → http://127.0.0.1
-
-Copy:
-
-PHPSESSID = be2d584526b42fef6742d5cf95ce008f
-Step 3: Logout from DVWA
-
-Click Logout.
-
-You will see login page.
-
-Step 4: Reuse OLD Session ID
-Option A (Exam Safe)
-Open Private Window
-Ctrl + Shift + P
-Go to:
-http://127.0.0.1/dvwa/
-Open Inspect → Storage → Cookies
-Paste OLD PHPSESSID
-Press Enter
-Step 5: Open Internal Page
-
-Open:
-
-http://127.0.0.1/dvwa/index.php
-
-or
-
-http://127.0.0.1/dvwa/vulnerabilities/brute/
-
-Do NOT login.
-
-Expected Result (DVWA LOW)
-Logged in again
-Without login
-Using old session ID
-Logout did NOT destroy session`,
+        BEFORE YOU START
+        DVWA security level = LOW
+        You are logged in as admin in DVWA
+        Step 1: Open DVWA (Victim Session)
+          Open Firefox
+          Go to:
+          http://127.0.0.1/dvwa
+          Login:
+          Username: admin
+          Password: password
+          Stay logged in (do NOT logout)
+          This browser is the Victim.
+        Step 2: Copy the Session ID (PHPSESSID)
+          Right click → Inspect
+          Click Storage tab
+          Click Cookies
+          Select:
+          http://127.0.0.1
+          You will see:
+          PHPSESSID a8c9f7e3d4b1...
+          Copy the PHPSESSID value.
+          This value is the session ID (user identity).
+        Step 3: Open Attacker Browser (Private Window)
+          Press:
+          Ctrl + Shift + P
+          Private Window opens.
+          Do NOT login here.
+        Step 4: Paste Session ID in Attacker Browser
+          In Private Window, go to:
+          http://127.0.0.1/dvwa
+          Right click → Inspect
+          Go to Storage → Cookies
+          Replace PHPSESSID with copied value
+          Press Enter
+        Step 5: Refresh Page
+          Refresh using:
+          F5
+          You are logged in as admin without username or password.
+          Result
+          Attacker gains access without login → Session Hijacking.
+        Experiment 5: Session Fixation
+          IMPORTANT CONDITIONS
+          DVWA Security Level = LOW
+          Use only ONE browser window
+          Do NOT use Private Window
+          Step 1: Open DVWA WITHOUT Login
+            Go to:
+            http://127.0.0.1/dvwa/
+            Do NOT login.
+          Step 2: Note the Session ID (Before Login)
+            Inspect → Storage → Cookies → http://127.0.0.1
+            Example:
+            PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+          Step 3: Login WITHOUT Closing Browser
+            Enter:
+            Username: admin
+            Password: password
+            Click Login.
+          Step 4: Check Session ID AGAIN (After Login)
+            Observe PHPSESSID carefully.
+            Case 1 (VULNERABLE – DVWA LOW)
+              Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+              After Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+              Same value → Session Fixation exists.
+            Case 2 (SECURE – DVWA HIGH / IMPOSSIBLE)
+              Before Login PHPSESSID = 5f6194766020dcaa2c906358cbd2941b
+              After Login PHPSESSID = be2d584526b42fef6742d5cf95ce008f
+              Session regenerated → No session fixation.
+        Experiment 6
+          CONDITIONS
+            DVWA Security Level = LOW
+            Must know how to view cookies
+          Step 1: Login Normally
+            Go to:
+              http://127.0.0.1/dvwa/
+            Login using:
+              Username: admin
+              Password: password
+          Step 2: Copy Session ID
+            Inspect → Storage → Cookies → http://127.0.0.1
+            Copy:
+              PHPSESSID = be2d584526b42fef6742d5cf95ce008f
+          Step 3: Logout from DVWA
+            Click Logout.
+            You will see login page.
+          Step 4: Reuse OLD Session ID
+            Option A (Exam Safe)
+            Open Private Window
+            Ctrl + Shift + P
+            Go to:
+              http://127.0.0.1/dvwa/
+            Open Inspect → Storage → Cookies
+            Paste OLD PHPSESSID
+            Press Enter
+          Step 5: Open Internal Page
+            Open:
+              http://127.0.0.1/dvwa/index.php
+              or
+              http://127.0.0.1/dvwa/vulnerabilities/brute/
+              Do NOT login.
+              Expected Result (DVWA LOW)
+              Logged in again
+              Without login
+              Using old session ID
+              Logout did NOT destroy session`,
   },
   {
     id: "dvwa",
