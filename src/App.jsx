@@ -1129,7 +1129,10 @@ Step 4: Access Web Dashboard
   http://localhost:8090
 
 Step 5: Test Default Credentials
-  Try administrator login → success = weak auth vulnerability
+  Try administrator login 
+  User : admin@juice-sh.op
+  password : admin13
+   → success = weak auth vulnerability
 
 Step 6: Analyze Traffic (DevTools → Network tab)
   → Data visible in plain text → no encryption
