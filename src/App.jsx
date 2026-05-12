@@ -1193,7 +1193,7 @@ PHASE 3: Capture HTTPS Traffic
           Export Certificate (DER format) → Save as burpcer.der
   Step 2: Send to Emulator:
     cd C:\\\Users\\\anish\\\AppData\\\Local\\\Android\\\Sdk\\\platform-tools
-    adb push C:\\Users\\\anish\\\Downloads\\\burpcer.der /sdcard/Download/
+    adb push C:\\Users\\\anish\\\Downloads\\\Burpcer.der /sdcard/Download/
   Step 3: Emulator → Settings → Security & Privacy
           → Encryption & Credentials → Install Certificate
           → CA Certificate → Install burpcer.der
