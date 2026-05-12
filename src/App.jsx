@@ -4,25 +4,44 @@ const CC_SECTIONS = [
   {
     id: "ec2",
     title: "EC2",
-    content: `1. Windows:
-   Create an EC2 → Select Windows
-   Click on connect → RDP Client → Download Remote Desktop
-   Get password → decrypt → paste in administrator
-   Connect and administrator terminal will open
+    content: 
+    `
+      1. Windows:
+        → Create an EC2 
+        → Select Windows
+        → Click on connect 
+        → RDP Client 
+        → Download Remote Desktop
+        → Get password 
+        → decrypt 
+        → paste in administrator
+        Connect and administrator terminal will open
 
-2. Putty:
-   Create instance with key-pair ".ppk"
-   Connect → EC2 instance connect
-   Open Putty
-   Paste IPV4 in hostname
-   Left terminal → SSH → Auth → Credential
-   Upload .ppk file → Click Open → Login as ubuntu
+      2. Putty:
+        → Create instance with key-pair ".ppk"
+        → Connect 
+        → EC2 instance connect
+        → Open Putty
+        → Paste IPV4 in hostname
+        → Left terminal 
+          → SSH 
+            → Auth 
+              → Credential
+        → Upload .ppk file 
+        → Click Open 
+        → Login as username: xxxxx
 
-3. Puttygen:
-   Open PuTTYgen → Click Load
-   Change file type to All Files (.)
-   Select your .pem file → Click Save private key → Save as .ppk
-   Open Putty → Host: ec2-user@IP → Repeat Putty process`,
+      3. Puttygen:
+        → Open PuTTYgen 
+        → Click Load
+        → Change file type to All Files (.)
+        → Select your .pem file 
+        → Click Save private key 
+        → Save as .ppk
+        → Open Putty 
+        → Host: ec2-user@IP 
+        → Repeat Putty process
+    `,
   },
   {
     id: "ebs",
