@@ -758,6 +758,23 @@ Verification:
 Step 6: Open VirusTotal → Paste URL → Check results`,
   },
   {
+    id: "Opening DVWA Using Docker",
+    title: "DVWA with Docker",
+    content: `
+    Opening DVWA Using Docker
+      1. Pull DVWA Docker Image
+      docker pull vulnerables/web-dvwa
+      2. Run DVWA Container
+      docker run --rm -it -p 80:80 vulnerables/web-dvwa
+      3. Open Chrome Browser
+      4. Go to:
+      http://127.0.0.1
+      5. Login Credentials:
+      Username: admin
+      Password: password
+      6. DVWA login page opens successfully.`,
+  },
+  {
     id: "password",
     title: "Password Strength Checker",
     content: `Program 1: Simple Password Strength Checker
