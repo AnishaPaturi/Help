@@ -1,5 +1,45 @@
 import { useState, useRef } from "react";
 
+// ── Embedded zip files (base64) ──────────────────────────────────────────────
+const ZIPS = {
+  basic: {
+    name: "basic-eb-app.zip",
+    b64: "UEsDBBQAAAAIALGErFytUyofjwAAALkAAAAOAAAAYXBwbGljYXRpb24ucHk1jb0KwjAURvf7FNcuSRfdhYAtKO4KjpdobzQ0f6TJ+5ta/LbzDeeYHD0ap5cZrU8xF7ysAKBTQrWBJAraM1EPcGr/PsdaWIqD6GFig5/oWfZHwLbMpeaA3ZWdi2hW+/C44bl5in3hyDosRbsZR700HlLadQDW4L+BSqEg8toGIrFJf80a5MTP+lb3XLmHL1BLAwQUAAAACACxhKxcADdMDh8AAAAeAAAAEAAAAHJlcXVpcmVtZW50cy50eHRzy0kszra1NdYz0DPmSi/Ny0zOL8qztTUyAgoYcAEAUEsBAhQDFAAAAAgAsYSsXK1TKh+PAAAAuQAAAA4AAAAAAAAAAAAAAKSBAAAAAGFwcGxpY2F0aW9uLnB5UEsBAhQDFAAAAAgAsYSsXAA3TA4fAAAAHgAAABAAAAAAAAAAAAAAAKSBuwAAAHJlcXVpcmVtZW50cy50eHRQSwUGAAAAAAIAAgB6AAAACAEAAAAA",
+    label: "basic-eb-app.zip",
+    desc: "application.py + requirements.txt",
+  },
+  styled: {
+    name: "styled-eb-app.zip",
+    b64: "UEsDBBQAAAAAALGErFwAAAAAAAAAAAAAAAAKAAAAdGVtcGxhdGVzL1BLAwQUAAAACACxhKxclnJiMYYAAAC6AAAADgAAAGFwcGxpY2F0aW9uLnB5XY2xCgIxEET7/YrtkoCcvRCw8gvsl0g2XvA2CWsCfr7Rw8bpZoZ5k7QKpi08H5ilVe14+ZgDKpfISp2lbaEzQGgN/d5aohKEiRzAeeaL1tHZmqNxEDnhWoWtOwFOKfeh5R9nTZ7+taxdtjmCnPDHRO/REEnIhcjskO/HKDbybdz9VQc7eANQSwMEFAAAAAgAsYSsXAA3TA4fAAAAHgAAABAAAAByZXF1aXJlbWVudHMudHh0c8tJLM62tTXWM9Az5kovzctMzi/Ks7U1MgIKGHABAFBLAwQUAAAACACxhKxcG0CsW50CAAD9BQAAFAAAAHRlbXBsYXRlcy9pbmRleC5odG1sfVRLbtswEN3nFIy6iA1YtqTEaKLKBtK02RUt0HSRJUVSEmuaJEjKHxQFeo5uesUeoUNJiWVbKA1LFDkznPdm+LLLD58fnp6/fESVW4vlReZfSGBZLgImA7/AMF1eIBjZmjmMSIWNZW4RfHt6DG+D/pbEa7YINpxttTIuQERJxySYbjl11YKyDScsbD4miEvuOBahJViwRTyNXkI57gRbfhTYOk7Qe4aldVis0Fe3F4yie62zWWvT2lu/3s79yBXdox+vn36ssSm5TFH07mi5gPTCAq+52Kfo3kAyE2ThtNAyw4tj2xyTVWlULWmKBJcMm7A0mHKAN4qv55SVE/QmZtfkbQKTBM+Tu9vxcQiihDIp2lbcseMdyq0WGJIoBNsdb32vgYViH3ZUpojAk5ljIyx4KUMIu7bDBhXjZQXOcRRtqsPWz4vX6ZRgQ09o62M2ZY5HyXw+eflH0/gEn8aUclmm6CbSJyhyZSgzoSeshhSTMwPHdi5sYAwDyNUutBWmagtVRLd618Ros4omzW96PT4vGTVKhwUXEDBFuajNKAa/8SAFVTzYNmGunFNrT14/656jPvFTGhPuoJzR9G7QIa8hohw+zSk9RNAruXHiwd8MM5wiqST7L/fxeXF6ZR5ozq5tu+YeuEHbrrlyJeiJa22s99WKH5f0jIu0UhtmThhxBi5joQxw34jECERiflLkxgaERPnrPU1s/wz/zGadPGSzVsgyrw+dclC+QQR0xi4C3/7BQUSyKl7+/fP7FzqXoUZ/YPtgq5fPqjbItvr0CB4rhLVG3CJTSwllQ7YmhFlb1ELsp9lM97y7ZlCSCE5WiwCAGje6Oj8Ywm2VWUG4y6txL1c/Hrwv+sQOYWdt3A7pDKB6DlrwkH8j9v8AUEsBAhQDFAAAAAAAsYSsXAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAQAO1BAAAAAHRlbXBsYXRlcy9QSwECFAMUAAAACACxhKxclnJiMYYAAAC6AAAADgAAAAAAAAAAAAAApIEoAAAAYXBwbGljYXRpb24ucHlQSwECFAMUAAAACACxhKxcADdMDh8AAAAeAAAAEAAAAAAAAAAAAAAApIHaAAAAcmVxdWlyZW1lbnRzLnR4dFBLAQIUAxQAAAAIALGErFwbQKxbnQIAAP0FAAAUAAAAAAAAAAAAAACkgScBAAB0ZW1wbGF0ZXMvaW5kZXguaHRtbFBLBQYAAAAABAAEAPQAAAD2AwAAAAA=",
+    label: "styled-eb-app.zip",
+    desc: "application.py + requirements.txt + templates/index.html",
+  },
+  package: {
+    name: "package.zip",
+    b64: "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",
+    label: "package.zip",
+    desc: "server.js + package.json + package-lock.json",
+  },
+};
+
+function b64toBlob(b64, mime = "application/zip") {
+  const byteChars = atob(b64);
+  const byteNums = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+  return new Blob([new Uint8Array(byteNums)], { type: mime });
+}
+
+function downloadZip(key) {
+  const z = ZIPS[key];
+  const blob = b64toBlob(z.b64);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = z.name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 const CC_SECTIONS = [
   {
     id: "ec2",
@@ -490,9 +530,71 @@ Step 5: SSH into instance and verify:
   },
 ];
 
+// ── Download button strip shown inside Beanstalk section ─────────────────────
+function BeanstalkDownloads() {
+  const [clicked, setClicked] = useState(null);
 
+  const handle = (key) => {
+    setClicked(key);
+    downloadZip(key);
+    setTimeout(() => setClicked(null), 1500);
+  };
+
+  const entries = [
+    { key: "package", icon: "📦", label: "package.zip", sub: "Node.js app  ·  server.js + package.json" },
+    { key: "basic",   icon: "📄", label: "basic-eb-app.zip", sub: "Python app  ·  application.py + requirements.txt" },
+    { key: "styled",  icon: "🎨", label: "styled-eb-app.zip", sub: "Python app with HTML template" },
+  ];
+
+  return (
+    <div style={{ marginTop: "18px", borderTop: "1px dashed #ccc", paddingTop: "14px" }}>
+      <div style={{ fontFamily: "monospace", fontSize: "12px", color: "#888", marginBottom: "10px", letterSpacing: "0.05em" }}>
+        ↓ DOWNLOAD APP BUNDLES
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {entries.map(({ key, icon, label, sub }) => (
+          <button
+            key={key}
+            onClick={() => handle(key)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              background: clicked === key ? "#f0f0f0" : "#fafafa",
+              border: "1px solid #d0d0d0",
+              borderRadius: "4px",
+              padding: "10px 14px",
+              cursor: "pointer",
+              textAlign: "left",
+              transition: "background 0.15s, border-color 0.15s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#999"; e.currentTarget.style.background = "#f5f5f5"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#d0d0d0"; e.currentTarget.style.background = clicked === key ? "#f0f0f0" : "#fafafa"; }}
+          >
+            <span style={{ fontSize: "16px" }}>{icon}</span>
+            <div>
+              <div style={{ fontFamily: "monospace", fontSize: "13px", color: "#000", fontWeight: "600" }}>
+                {clicked === key ? "✓ downloading…" : label}
+              </div>
+              <div style={{ fontFamily: "monospace", fontSize: "11px", color: "#888", marginTop: "2px" }}>
+                {sub}
+              </div>
+            </div>
+            <span style={{ marginLeft: "auto", fontFamily: "monospace", fontSize: "12px", color: "#aaa" }}>
+              {clicked === key ? "" : "↓"}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Section accordion ─────────────────────────────────────────────────────────
 function Section({ section, idx }) {
   const [open, setOpen] = useState(false);
+  const isBeanstalk = section.id === "beanstalk";
+
   return (
     <div style={{ borderBottom: "1px solid #e0e0e0", padding: "8px 0" }}>
       <div
@@ -516,29 +618,37 @@ function Section({ section, idx }) {
         </span>
       </div>
       {open && (
-        <pre
+        <div
           style={{
             marginTop: "10px",
-            fontFamily: "monospace",
-            fontSize: "13px",
-            lineHeight: "1.7",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
             background: "#f7f7f7",
-            color: "#000",
-            padding: "16px",
             border: "1px solid #e0e0e0",
             borderRadius: "4px",
-            textAlign: "left",
+            padding: "16px",
           }}
         >
-          {section.content}
-        </pre>
+          <pre
+            style={{
+              fontFamily: "monospace",
+              fontSize: "13px",
+              lineHeight: "1.7",
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              color: "#000",
+              margin: 0,
+              textAlign: "left",
+            }}
+          >
+            {section.content}
+          </pre>
+          {isBeanstalk && <BeanstalkDownloads />}
+        </div>
       )}
     </div>
   );
 }
 
+// ── Upload banner (unchanged) ─────────────────────────────────────────────────
 function DownloadBanner({ zipFile, onUpload, onRemove }) {
   const inputRef = useRef();
 
@@ -568,9 +678,7 @@ function DownloadBanner({ zipFile, onUpload, onRemove }) {
           flexWrap: "wrap",
         }}
       >
-        <span style={{ fontFamily: "monospace", fontSize: "13px", color: "#555" }}>
-          📦
-        </span>
+        <span style={{ fontFamily: "monospace", fontSize: "13px", color: "#555" }}>📦</span>
         <a
           href={zipFile.url}
           download={zipFile.name}
@@ -644,6 +752,7 @@ function DownloadBanner({ zipFile, onUpload, onRemove }) {
   );
 }
 
+// ── Root ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [tab, setTab] = useState("cc");
   const [zipFile, setZipFile] = useState(null);
@@ -685,11 +794,7 @@ export default function App() {
           textAlign: "left",
         }}
       >
-        <DownloadBanner
-          zipFile={zipFile}
-          onUpload={handleUpload}
-          onRemove={handleRemove}
-        />
+        <DownloadBanner zipFile={zipFile} onUpload={handleUpload} onRemove={handleRemove} />
 
         <div
           style={{
@@ -718,25 +823,6 @@ export default function App() {
               CC
             </h2>
             {CC_SECTIONS.map((s, i) => (
-              <Section key={s.id} section={s} idx={i} />
-            ))}
-          </div>
-        )}
-
-        {tab === "cs" && (
-          <div>
-            <h2
-              style={{
-                fontFamily: "monospace",
-                fontSize: "28px",
-                marginBottom: "24px",
-                color: "#000",
-                textAlign: "left",
-              }}
-            >
-              CS
-            </h2>
-            {CS_SECTIONS.map((s, i) => (
               <Section key={s.id} section={s} idx={i} />
             ))}
           </div>
