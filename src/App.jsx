@@ -46,56 +46,87 @@ const CC_SECTIONS = [
   {
     id: "ebs",
     title: "EBS",
-    content: `1(a) Creating and Attaching an EBS Volume
-
-Step 1: Create EC2 instance with t2.micro
-Step 2: EC2 Dashboard → Volumes → Create Volume
-        Type: gp3 | Size: 20 GiB | Same AZ as EC2
-
-Step 3: Attach Volume → Actions → Attach Volume
-        Device name: /dev/xvdd
-
-Step 4: Verify inside EC2 → lsblk
-
-PHASE 2
-Step 5: sudo fdisk /dev/xvdd → Inside fdisk: n p Enter Enter Enter w
-        sudo partprobe
-Step 6: lsblk
-Step 7: sudo mkfs.xfs /dev/xvdd1
-Step 8: sudo mkdir /mnt/ebsdata
-Step 9: sudo mount /dev/xvdf1 /mnt/ebsdata → Verify: df -h
-Step 10: cd /mnt/ebsdata && sudo touch testfile.txt && ls
-
-PHASE 3
-Step 11: sudo blkid /dev/xvdd1
-Step 12: sudo nano /etc/fstab
-         Add: UUID=xxxx... /mnt/ebsdata xfs defaults,nofail 0 0
-Step 13: sudo mount -a
-Step 14: sudo reboot → Reconnect → df -h`,
+    content: 
+    `
+      PHASE 1
+        Creating and Attaching an EBS Volume: 
+          Step 1: 
+            Create EC2 instance with t2.micro
+          Step 2: 
+            EC2 Dashboard 
+              → Volumes 
+                → Create Volume
+                  Type: gp3 
+                  Size: 20 GiB
+                  Same AZ as EC2
+          Step 3: 
+            Attach Volume 
+              → Actions 
+                → Attach Volume
+                  Device name: /dev/xvdd
+          Step 4: 
+            Verify inside EC2 → lsblk
+      PHASE 2
+        Step 5: 
+          sudo fdisk /dev/xvdd 
+            → Inside fdisk: 
+              n 
+              p 
+              Enter 
+              Enter 
+              Enter 
+              w
+          sudo partprobe
+        Step 6: 
+          lsblk
+        Step 7: 
+          sudo mkfs.xfs /dev/xvdd1
+        Step 8: 
+          sudo mkdir /mnt/ebsdata
+        Step 9: 
+          sudo mount /dev/xvdf1 /mnt/ebsdata 
+            → Verify: 
+              df -h
+        Step 10: 
+          cd /mnt/ebsdata && sudo touch testfile.txt && ls
+      PHASE 3
+        Step 11: 
+          sudo blkid /dev/xvdd1
+        Step 12: 
+          sudo nano /etc/fstab
+            Add: UUID=xxxx... /mnt/ebsdata xfs defaults,nofail 0 0
+        Step 13: 
+          sudo mount -a
+        Step 14: 
+          sudo reboot 
+          → Reconnect 
+          → df -h
+    `,
   },
   {
     id: "efs",
     title: "EFS",
-    content: `1. Create Security Group
-   Inbound: SSH → Anywhere | NFS → Anywhere
-
-2. Create EFS → Add Security Group
-
-3. Create 2 EC2 instances → Attach same Security Group
-
-4. Run on both EC2 instances:
-   sudo yum install -y amazon-efs-utils
-   sudo mkdir /efs
-   sudo mount -t efs <EFS-ID>:/ /efs
-
-5. Permanent Mount:
-   <EFS-ID>:/ /efs efs defaults,_netdev 0 0
-
-EC2-1:
-   cd /efs && echo "hello EC2-2" > /efs/test.txt
-
-EC2-2:
-   cat /efs/test.txt`,
+    content: 
+    `
+      1. Create Security Group
+        Inbound: SSH 
+                  → Anywhere 
+                    | NFS 
+                        → Anywhere
+      2. Create EFS 
+        → Add Security Group
+      3. Create 2 EC2 instances 
+        → Attach same Security Group
+      4. Run on both EC2 instances:
+        sudo yum install -y amazon-efs-utils
+        sudo mkdir /efs
+        sudo mount -t efs <EFS-ID>:/ /efs
+      5. Permanent Mount:
+        <EFS-ID>:/ /efs efs defaults,_netdev 0 0
+        EC2-1:
+          cd /efs && echo "hello EC2-2" > /efs/test.txt
+        EC2-2:
+          cat /efs/test.txt`,
   },
   {
     id: "s3",
