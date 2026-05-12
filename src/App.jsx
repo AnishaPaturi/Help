@@ -1254,11 +1254,17 @@ Step 5: Verify:
   ls -lh /home/kali/practice_disk.dd
   cat /home/kali/acquisition.log
 Step 6: Start Autopsy:
-  autopsy → Open http://localhost:9999/autopsy
+  sudo autopsy → Open http://localhost:9999/autopsy
 Step 7: Create New Case → Enter case details
+    Case name : Forensic_Analysis
+    Description : Disk image analysis practice
+    Investigator : Names...
 Step 8: Add Disk Image:
   Add Host → Add Image → /home/kali/practice_disk.dd
-  Host: KaliLabMachine | Description: Kali Linux VM
+  Host Name: KaliLabMachine | Description: Kali Linux VM | Rest Default 
+  Adding Host → Add Image → Add Image File -> In Image File Path: /home/kali/practice_disk.dd → Type : Partition -> Next
+  Image File Details : 
+    Select Calculate the hash of the image file → Add → Ok
 Step 9: Analyze:
   - File system structure
   - Deleted files
