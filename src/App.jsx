@@ -3,16 +3,16 @@ import { useState, useRef } from "react";
 // ── Embedded zip files (base64) ──────────────────────────────────────────────
 const ZIPS = {
   basic: {
-    name: "basic-eb-app.zip",
-    b64: "UEsDBBQAAAAIALGErFytUyofjwAAALkAAAAOAAAAYXBwbGljYXRpb24ucHk1jb0KwjAURvf7FNcuSRfdhYAtKO4KjpdobzQ0f6TJ+5ta/LbzDeeYHD0ap5cZrU8xF7ysAKBTQrWBJAraM1EPcGr/PsdaWIqD6GFig5/oWfZHwLbMpeaA3ZWdi2hW+/C44bl5in3hyDosRbsZR700HlLadQDW4L+BSqEg8toGIrFJf80a5MTP+lb3XLmHL1BLAwQUAAAACACxhKxcADdMDh8AAAAeAAAAEAAAAHJlcXVpcmVtZW50cy50eHRzy0kszra1NdYz0DPmSi/Ny0zOL8qztTUyAgoYcAEAUEsBAhQDFAAAAAgAsYSsXK1TKh+PAAAAuQAAAA4AAAAAAAAAAAAAAKSBAAAAAGFwcGxpY2F0aW9uLnB5UEsBAhQDFAAAAAgAsYSsXAA3TA4fAAAAHgAAABAAAAAAAAAAAAAAAKSBuwAAAHJlcXVpcmVtZW50cy50eHRQSwUGAAAAAAIAAgB6AAAACAEAAAAA",
-    label: "basic-eb-app.zip",
-    desc: "application.py + requirements.txt",
+    name: "basic-node-eb-app.zip",
+    b64: "UEsDBBQAAAAIALWGrFxjCMoBwQAAABEBAAAJAAAAc2VydmVyLmpzTY5BigIxEEX3nuILQtIgGZeCKCgMzGpmGD2ATVs2rTEVK1EG1LtbLVmYXd6v+q8aDimD/qNQSphD6HzphKwpyFSzQfOaqWPUvGCruPDfn7+NBlG40cBRuLoXut8xnUwnOqebrqVszYcZw6phrJpUYb7AbQB9+nOJws6aL/KesRc+4Zt35A4Jn75OuWuwolp1tT9iGeOwv+tRlXLfpUzB9loVvBX3F7In57m12zXJlQRyCaELLTggsmSMbv3eY1sKn1BLAwQUAAAACAC1hqxc7mrxm5gAAADrAAAADAAAAHBhY2thZ2UuanNvbk2OTQ6CMBCF95xi0rU0YNzoThK3HMFkKLOoQmk6jTEh3N0ZwOjy/Xwvby4ATMCRzAVMh+xdGaaeSupKjNEcNH5RYj8FbdS2stXm9sQu+Zj3pFEWWmHtg+E2IGfRDWHgjMMTrt+1Ef0KMCUZlvJmb2MsySxSjYwpa1H/wK8t6bIfiBR6Cs7TH0bvmIjVMPeTrc/2uBLFUnwAUEsBAhQDFAAAAAgAtYasXGMIygHBAAAAEQEAAAkAAAAAAAAAAAAAAKSBAAAAAHNlcnZlci5qc1BLAQIUAxQAAAAIALWGrFzuavGbmAAAAOsAAAAMAAAAAAAAAAAAAACkgegAAABwYWNrYWdlLmpzb25QSwUGAAAAAAIAAgBxAAAAqgEAAAAA",
+    label: "basic-node-eb-app.zip",
+    desc: "Node.js app  ·  server.js + package.json",
   },
   styled: {
-    name: "styled-eb-app.zip",
-    b64: "UEsDBBQAAAAAALGErFwAAAAAAAAAAAAAAAAKAAAAdGVtcGxhdGVzL1BLAwQUAAAACACxhKxclnJiMYYAAAC6AAAADgAAAGFwcGxpY2F0aW9uLnB5XY2xCgIxEET7/YrtkoCcvRCw8gvsl0g2XvA2CWsCfr7Rw8bpZoZ5k7QKpi08H5ilVe14+ZgDKpfISp2lbaEzQGgN/d5aohKEiRzAeeaL1tHZmqNxEDnhWoWtOwFOKfeh5R9nTZ7+taxdtjmCnPDHRO/REEnIhcjskO/HKDbybdz9VQc7eANQSwMEFAAAAAgAsYSsXAA3TA4fAAAAHgAAABAAAAByZXF1aXJlbWVudHMudHh0c8tJLM62tTXWM9Az5kovzctMzi/Ks7U1MgIKGHABAFBLAwQUAAAACACxhKxcG0CsW50CAAD9BQAAFAAAAHRlbXBsYXRlcy9pbmRleC5odG1sfVRLbtswEN3nFIy6iA1YtqTEaKLKBtK02RUt0HSRJUVSEmuaJEjKHxQFeo5uesUeoUNJiWVbKA1LFDkznPdm+LLLD58fnp6/fESVW4vlReZfSGBZLgImA7/AMF1eIBjZmjmMSIWNZW4RfHt6DG+D/pbEa7YINpxttTIuQERJxySYbjl11YKyDScsbD4miEvuOBahJViwRTyNXkI57gRbfhTYOk7Qe4aldVis0Fe3F4yie62zWWvT2lu/3s79yBXdox+vn36ssSm5TFH07mi5gPTCAq+52Kfo3kAyE2ThtNAyw4tj2xyTVWlULWmKBJcMm7A0mHKAN4qv55SVE/QmZtfkbQKTBM+Tu9vxcQiihDIp2lbcseMdyq0WGJIoBNsdb32vgYViH3ZUpojAk5ljIyx4KUMIu7bDBhXjZQXOcRRtqsPWz4vX6ZRgQ09o62M2ZY5HyXw+eflH0/gEn8aUclmm6CbSJyhyZSgzoSeshhSTMwPHdi5sYAwDyNUutBWmagtVRLd618Ros4omzW96PT4vGTVKhwUXEDBFuajNKAa/8SAFVTzYNmGunFNrT14/656jPvFTGhPuoJzR9G7QIa8hohw+zSk9RNAruXHiwd8MM5wiqST7L/fxeXF6ZR5ozq5tu+YeuEHbrrlyJeiJa22s99WKH5f0jIu0UhtmThhxBi5joQxw34jECERiflLkxgaERPnrPU1s/wz/zGadPGSzVsgyrw+dclC+QQR0xi4C3/7BQUSyKl7+/fP7FzqXoUZ/YPtgq5fPqjbItvr0CB4rhLVG3CJTSwllQ7YmhFlb1ELsp9lM97y7ZlCSCE5WiwCAGje6Oj8Ywm2VWUG4y6txL1c/Hrwv+sQOYWdt3A7pDKB6DlrwkH8j9v8AUEsBAhQDFAAAAAAAsYSsXAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAQAO1BAAAAAHRlbXBsYXRlcy9QSwECFAMUAAAACACxhKxclnJiMYYAAAC6AAAADgAAAAAAAAAAAAAApIEoAAAAYXBwbGljYXRpb24ucHlQSwECFAMUAAAACACxhKxcADdMDh8AAAAeAAAAEAAAAAAAAAAAAAAApIHaAAAAcmVxdWlyZW1lbnRzLnR4dFBLAQIUAxQAAAAIALGErFwbQKxbnQIAAP0FAAAUAAAAAAAAAAAAAACkgScBAAB0ZW1wbGF0ZXMvaW5kZXguaHRtbFBLBQYAAAAABAAEAPQAAAD2AwAAAAA=",
-    label: "styled-eb-app.zip",
-    desc: "application.py + requirements.txt + templates/index.html",
+    name: "styled-node-eb-app.zip",
+    b64: "UEsDBBQAAAAAALWGrFwAAAAAAAAAAAAAAAAHAAAAcHVibGljL1BLAwQUAAAACAC1hqxcCQ00fNoAAABuAQAACQAAAHNlcnZlci5qc32PMW8CMQyFd36Fh0pJpFNgRKro2JWqZYdrzjpSBSd1cggJ+O91UIqYyBS/5+/ZdpFyATwlxpxhBYy/k2fUqknKvM7crSf1Zf/YUOvqNrtPSdxG6Tv1sf7ciJ44OtEt0tHepMsFlovlQnAB7ZRRN9Tm0hfvdI23P9GT3m4Hz9QfsAOVpu/gnTLGNHLEotVcdaBlsU62ywZWb3CegTypbEYa3n3A54Hy8zTgye7LIaiafv2fEHwuSLpuLVMe0uuBMaANcdS7L+QjMvBE5GmESJAiF3g5V+66a4F/UEsDBBQAAAAIALWGrFwZuZczmgAAAO0AAAAMAAAAcGFja2FnZS5qc29uTY4xD4IwEIV3fsWlszRgXHTTxJXF3eSkb6hCaXqN0RD+uy1gdLz3vu/lxoJIOe6hDqQkvjuY0g0GJW4le682uX8iiB1cRmpd6WpJDaQN1se1ucwyNUnWd6FzxxJtSyewk8jdg47fuZ7tbAhCWk7wEi9rkpoxnTmIHGIG80P0o1M7rR94OAPXWvxpePkAyYG67nS919vZKKbiA1BLAwQUAAAACAC1hqxcWbuCs5oCAAAGBQAAEQAAAHB1YmxpYy9pbmRleC5odG1sdVTJbtswEL3nKybqITZgyZIXIFVkA9l66wIkPeRIiWOJCUUSJOWlRYF+Ry/9xX5CqTWxi8KwRc/GNzPvKTm/+3z7+PTlHgpb8vVZUj+AE5GvPBRebUBC12cASYmWQFYQbdCuvK+PH/xL79UhSIkrb8twp6S2HmRSWBQucMeoLVYUtyxDv/kzASaYZYT7JiMcV1EQtoUssxzXD/bAkcInSRGulUqmrbkOMLWrPgGkkh7ge3MEKInOmYghvOoMG3e7vyEl44cYrrW7awKGCOMb1GzTR6Uke8m1rASNgTOBRPu5JpQ53KNovqSYT+BdtIhwHrrDbDFPl8txn5xJLnUMu4JZ7G0FsrywMURhuC16I2VGceJwbDjue+NzZSzbHPxuTDFk7hd17yac5cJ3lUtz7Ppx1jyCOo84yHqYgcW99Zu802Jv29R5Skaz5XLSf8MgGlpShFIm8hgWoRqQplJT1H49l8qBmb11ucJUS+VvGHf3xZDySo8iFzF+zd77piBU7tx24FLtmwItjHDSfIL5+Ki3Ihp6atZo2Dd09wZLjeXV0cL9VFory3rePaiuhhpKSEUyZt30w+D9UUhauVxxQiHfSnXc4zCTaFaDX5wOJgYhBf5nWNHJsPotHJGmI1LHryMG7zo+pZLTIbzSpo5Xkv1Di7anuJDbt8TQjvgbqd2cGr2NnN5eadx4nRplLZ9gZvp6Tm3TTm7JtH0HJLXmGh1StoWME2NW3kBEr9VlUkTrP79//Wz0GzwbuL9pVezsbYBaP8lKQ12cmQLuXR3LMrhBB8QS/gJEKWDGKXKLQTJVXVq3LykyzrKXlec60XZ0cYeKy0PpCA8PVZahMZuKn1+MvfVtHQcfMZm2qQ3yqYNed9S24lA1b72/UEsBAhQDFAAAAAAAtYasXAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAQAO1BAAAAAHB1YmxpYy9QSwECFAMUAAAACAC1hqxcCQ00fNoAAABuAQAACQAAAAAAAAAAAAAApIElAAAAc2VydmVyLmpzUEsBAhQDFAAAAAgAtYasXBm5lzOaAAAA7QAAAAwAAAAAAAAAAAAAAKSBJgEAAHBhY2thZ2UuanNvblBLAQIUAxQAAAAIALWGrFxZu4KzmgIAAAYFAAARAAAAAAAAAAAAAACkgeoBAABwdWJsaWMvaW5kZXguaHRtbFBLBQYAAAAABAAEAOUAAACzBAAAAAA=",
+    label: "styled-node-eb-app.zip",
+    desc: "Node.js app with HTML  ·  server.js + package.json + public/index.html",
   },
   package: {
     name: "package.zip",
@@ -332,7 +332,7 @@ Step 3: SNS Access Policy (allow S3 to publish):
     }
   }]
 }
-Step 4: S3 Event Notification → All object create → SNS
+Step 4: Properties → S3 Event Notification → All object create → SNS
 Step 5: Test — Upload file → receive email
 
 ──────────
@@ -354,17 +354,33 @@ Step 2:  Create SNS Topic → MyS3SNSTopic
 Step 3:  Create SQS Queue → MyS3Queue
 Step 4:  Subscribe SQS to SNS (Protocol: SQS)
 Step 5:  Add SQS Access Policy (allow SNS to send)
+    {
+      "Statement": [
+          {
+          "Effect": "Allow",
+          "Principal": {
+              "Service": "sns.amazonaws.com"
+          },
+          "Action": "sqs:SendMessage",
+          "Resource": "SQS ARN",
+          "Condition": {
+              "ArnEquals": {
+              "aws:SourceArn": "SNS ARN"
+              }
+          }
+          }
+      ]
+    }
 Step 6:  Add SNS Access Policy (allow S3 to publish)
 Step 7:  Configure S3 Event → All object create → SNS
 Step 8:  Test: Upload to S3 → SNS → SQS
 Step 9:  Verify in SQS → Poll messages
 Step 10: Lambda Consumer:
-
-def lambda_handler(event, context):
-    for record in event['Records']:
-        print("Message received from SQS:")
-        print(record['body'])
-    return {'statusCode': 200, 'body': 'Message processed'}`,
+  def lambda_handler(event, context):
+      for record in event['Records']:
+          print("Message received from SQS:")
+          print(record['body'])
+      return {'statusCode': 200, 'body': 'Message processed'}`,
   },
   {
     id: "elb",
@@ -475,58 +491,62 @@ Sample conversation:
   {
     id: "iam",
     title: "IAM",
-    content: `Part A: GUI Access (Management Console)
+    content: 
+    `
+      Part A: GUI Access (Management Console)
+        Step 1:  Login as Root User
+        Step 2:  Search IAM → Security, Identity, & Compliance
+        Step 3:  Users → Create user
+        Step 4:  Username: S3_Specialist
+                Enable: "Provide user access to the AWS Management Console"
+                Set custom password
+        Step 5:  Attach policies directly → AmazonS3FullAccess
+        Step 6:  Review → Create → Download .csv (contains password + sign-in URL)
+        Step 7:  Copy 12-digit Account ID → Sign out
 
-Step 1:  Login as Root User
-Step 2:  Search IAM → Security, Identity, & Compliance
-Step 3:  Users → Create user
-Step 4:  Username: S3_Specialist
-         Enable: "Provide user access to the AWS Management Console"
-         Set custom password
-Step 5:  Attach policies directly → AmazonS3FullAccess
-Step 6:  Review → Create → Download .csv (contains password + sign-in URL)
-Step 7:  Copy 12-digit Account ID → Sign out
+        Verification (IAM User Login):
+        Step 8:  Open Sign-in URL from .csv
+        Step 9:  Enter: Account ID | Username | Password
+        Step 10: Test 1 (Fail): Go to EC2 → Access Denied
+                Test 2 (Pass): Go to S3 → Create bucket → Works
 
-Verification (IAM User Login):
-Step 8:  Open Sign-in URL from .csv
-Step 9:  Enter: Account ID | Username | Password
-Step 10: Test 1 (Fail): Go to EC2 → Access Denied
-         Test 2 (Pass): Go to S3 → Create bucket → Works
+        ──────────
 
-──────────
+        Part B: CLI Access (Programmatic)
 
-Part B: CLI Access (Programmatic)
+        Step 1:  Login as Admin → IAM → Users → Select user
+        Step 2:  Security credentials → Access keys → Create access key
+        Step 3:  Select: Command Line Interface (CLI)
+        Step 4:  Download .csv (Access Key ID + Secret Access Key)
+        Step 5:  Install AWS CLI
+        Step 6:  Open Terminal → Run: aws configure
+        Step 7:  Enter: Access Key ID, Secret Access Key
+                Default region: ap-south-1 | Default output: json
 
-Step 1:  Login as Admin → IAM → Users → Select user
-Step 2:  Security credentials → Access keys → Create access key
-Step 3:  Select: Command Line Interface (CLI)
-Step 4:  Download .csv (Access Key ID + Secret Access Key)
-Step 5:  Install AWS CLI
-Step 6:  Open Terminal → Run: aws configure
-Step 7:  Enter: Access Key ID, Secret Access Key
-         Default region: ap-south-1 | Default output: json
-
-Verification:
-  aws s3 ls              → Lists S3 buckets ✓
-  aws s3 mb s3://bucket  → Creates bucket ✓
-  aws iam list-users     → AccessDenied ✗`,
+        Verification:
+          aws s3 ls              → Lists S3 buckets ✓
+          aws s3 mb s3://bucket  → Creates bucket ✓
+          aws iam list-users     → AccessDenied ✗
+    `,
   },
   {
     id: "iam-roles",
     title: "IAM Roles",
-    content: `Objective: Allow EC2 to access S3 without storing access keys.
+    content: 
+    `
+        Objective: Allow EC2 to access S3 without storing access keys.
+          Step 1: IAM → Roles → Create role
+                  Trusted entity: AWS Service | Use case: EC2 → Next
+          Step 2: Search: AmazonS3FullAccess → Select → Next
+          Step 3: Role name: EC2-S3-Role → Create role
+          Step 4: EC2 Dashboard → Select running instance
+                  Actions → Security → Modify IAM role
+                  Select: EC2-S3-Role → Update
+          Step 5: SSH into instance and verify:
 
-Step 1: IAM → Roles → Create role
-        Trusted entity: AWS Service | Use case: EC2 → Next
-Step 2: Search: AmazonS3FullAccess → Select → Next
-Step 3: Role name: EC2-S3-Role → Create role
-Step 4: EC2 Dashboard → Select running instance
-        Actions → Security → Modify IAM role
-        Select: EC2-S3-Role → Update
-Step 5: SSH into instance and verify:
-
-  aws s3 ls                 → ✓ Works (S3 allowed)
-  aws ec2 describe-instances → ✗ Unauthorized`,
+            aws s3 ls                 → ✓ Works (S3 allowed)
+            aws ec2 describe-instances → ✗ Unauthorized
+    `,
   },
 ];
 
@@ -541,9 +561,9 @@ function BeanstalkDownloads() {
   };
 
   const entries = [
-    { key: "package", icon: "📦", label: "package.zip", sub: "Node.js app  ·  server.js + package.json" },
-    { key: "basic",   icon: "📄", label: "basic-eb-app.zip", sub: "Python app  ·  application.py + requirements.txt" },
-    { key: "styled",  icon: "🎨", label: "styled-eb-app.zip", sub: "Python app with HTML template" },
+    { key: "package", icon: "📦", label: "package.zip", sub: "Node.js app  ·  server.js + package.json + package-lock.json" },
+    { key: "basic",   icon: "📄", label: "basic-node-eb-app.zip", sub: "Node.js app  ·  server.js + package.json" },
+    { key: "styled",  icon: "🎨", label: "styled-node-eb-app.zip", sub: "Node.js app with HTML  ·  server.js + package.json + public/index.html" },
   ];
 
   return (
