@@ -171,216 +171,223 @@ const CC_SECTIONS = [
   {
     id: "s3",
     title: "S3",
-    content: `1. Create Bucket
-   Bucket Policy:
-   {
-     "Version": "2012-10-17",
-     "Statement": [{
-       "Sid": "PublicReadGetObject",
-       "Effect": "Allow",
-       "Principal": "*",
-       "Action": "s3:GetObject",
-       "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
-     }]
-   }
+    content: 
+    `
+      1. Create Bucket
+        Bucket Policy:
+        {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
+          }]
+        }
 
-2. Enable Versioning
+      2. Enable Versioning
 
-3. Cross Region Replication
-   Management → Create Replication
-   Destination: Another region | Role: LabRole
+      3. Cross Region Replication
+        Management → Create Replication
+        Destination: Another region | Role: LabRole
 
-4. Static Website Hosting
-   Properties → Static Website Hosting → Enable
-   Upload: index.html, error.html`,
+      4. Static Website Hosting
+        Properties → Static Website Hosting → Enable
+        Upload: index.html, error.html
+        Go to each object and make them public through permissions → Object Ownership → ACLs enabled
+    `,
   },
   {
     id: "vpc",
     title: "VPC",
-    content: `Create VPC: CIDR 10.0.0.0/16
+    content: 
+    `
+    Create VPC: CIDR 10.0.0.0/16
 
-Subnets:
-  Public:  10.0.1.0/24
-  Private: 10.0.2.0/24
+    Subnets:
+      Public:  10.0.1.0/24
+      Private: 10.0.2.0/24
 
-Internet Gateway: Create and Attach
+    Internet Gateway: Create and Attach
 
-Route Table:
-  Destination: 0.0.0.0/0
-  Attach Internet Gateway → Associate Public Subnet
+    Route Table:
+      Destination: 0.0.0.0/0
+      Attach Internet Gateway → Associate Public Subnet
 
-EC2 Security Groups:
-  Public:  SSH → Anywhere | HTTP → Anywhere
-  Private: SSH → Public SG
+    EC2 Security Groups:
+      Public:  SSH → Anywhere | HTTP → Anywhere
+      Private: SSH → Public SG
 
-Install Apache:
-  sudo yum install httpd -y
-  sudo systemctl start httpd && sudo systemctl enable httpd
-  echo "Public EC2 Live" | sudo tee /var/www/html/index.html
+    Install Apache:
+      sudo yum install httpd -y
+      sudo systemctl start httpd && sudo systemctl enable httpd
+      echo "Public EC2 Live" | sudo tee /var/www/html/index.html
 
-Install Nginx:
-  sudo yum update -y
-  sudo yum install nginx -y
-  sudo systemctl start nginx && sudo systemctl enable nginx`,
+    Install Nginx:
+      sudo yum update -y
+      sudo yum install nginx -y
+      sudo systemctl start nginx && sudo systemctl enable nginx`,
   },
   {
     id: "bastion",
     title: "VPC Bastion",
-    content: `Create Bastion EC2 → Connect using ssh -i
-
-Transfer key:
-  scp -i "Key-pair.pem" Key-pair.pem ec2-user@IP:/home/ec2-user/
-
-Inside Bastion:
-  chmod 400 Key-pair.pem
-  ssh -i Key-pair.pem ec2-user@PRIVATE_IP`,
+    content: 
+      `
+        Create Bastion EC2 → Connect using ssh -i
+        Transfer key (Outside Bastion):
+          scp -i "Key-pair.pem" Key-pair.pem ec2-user@IP:/home/ec2-user/
+        Inside Bastion:
+          chmod 400 Key-pair.pem
+          ssh -i Key-pair.pem ec2-user@PRIVATE_IP`,
   },
   {
     id: "nat",
     title: "VPC NAT Gateway",
-    content: `1. Allocate Elastic IP
-2. Create NAT Gateway
-3. Create Private Route Table
-4. Test:
-   ping -c 3 google.com`,
+    content: `
+    1. Allocate Elastic IP
+    2. Create NAT Gateway
+    3. Create Private Route Table
+    4. Test:
+      ping -c 3 google.com`,
   },
   {
     id: "lambda",
     title: "AWS Lambda",
     content: `Lambda Function
 
-Step 1: Open AWS Lambda → Search Lambda → Open dashboard
-Step 2: Create function → Select "Author from scratch"
-Step 3: Name: MyFirstLambda | Runtime: Python 3.x
-Step 4: Role → Select LabRole
-Step 5: Code:
+        Step 1: Open AWS Lambda → Search Lambda → Open dashboard
+        Step 2: Create function → Select "Author from scratch"
+        Step 3: Name: MyFirstLambda | Runtime: Python 3.x
+        Step 4: Role → Select LabRole
+        Step 5: Code:
 
-def lambda_handler(event, context):
-    return "Hello AWS Lambda"
+        def lambda_handler(event, context):
+            return "Hello AWS Lambda"
 
-Step 6: Deploy & Test
+        Step 6: Deploy & Test
 
-──────────────────────────────────────────────
+        ──────────────────────────────────────────────
 
-Add S3 Trigger to Lambda
+        Add S3 Trigger to Lambda
 
-Step 1: Login to AWS Console
-Step 2: Create S3 Bucket → s3-lambda-demo123
-Step 3: Create DynamoDB Table
-        Table name: newtable | Partition key: unique (String)
-Step 4: Create Lambda Function
-        Name: S3ToDynamoDB | Runtime: Python 3.x
-        Permissions: Create new role with basic Lambda permissions
-Step 5: Attach permissions → Configuration → Permissions
-        AmazonS3FullAccess, AmazonDynamoDBFullAccess, CloudWatchLogsFullAccess
-Step 6: Lambda Code:
+        Step 1: Login to AWS Console
+        Step 2: Create S3 Bucket → s3-lambda-demo123
+        Step 3: Create DynamoDB Table
+                Table name: newtable | Partition key: unique (String)
+        Step 4: Create Lambda Function
+                Name: S3ToDynamoDB | Runtime: Python 3.x
+                Permissions: Create new role with basic Lambda permissions
+        Step 5: Attach permissions → Configuration → Permissions
+                AmazonS3FullAccess, AmazonDynamoDBFullAccess, CloudWatchLogsFullAccess
+        Step 6: Lambda Code:
 
-import boto3
-from uuid import uuid4
+        import boto3
+        from uuid import uuid4
 
-def lambda_handler(event, context):
-    dynamodb = boto3.resource('dynamodb')
-    if 'Records' in event:
-        for record in event['Records']:
-            bucket_name = record['s3']['bucket']['name']
-            object_key  = record['s3']['object']['key']
-            size        = record['s3']['object'].get('size', -1)
-            event_name  = record.get('eventName', 'Unknown')
-            event_time  = record.get('eventTime', 'Unknown')
-            table = dynamodb.Table('newtable')
-            table.put_item(Item={
-                'unique': str(uuid4()),
-                'Bucket': bucket_name,
-                'Object': object_key,
-                'Size': size,
-                'Event': event_name,
-                'EventTime': event_time
-            })
+        def lambda_handler(event, context):
+            dynamodb = boto3.resource('dynamodb')
+            if 'Records' in event:
+                for record in event['Records']:
+                    bucket_name = record['s3']['bucket']['name']
+                    object_key  = record['s3']['object']['key']
+                    size        = record['s3']['object'].get('size', -1)
+                    event_name  = record.get('eventName', 'Unknown')
+                    event_time  = record.get('eventTime', 'Unknown')
+                    table = dynamodb.Table('newtable')
+                    table.put_item(Item={
+                        'unique': str(uuid4()),
+                        'Bucket': bucket_name,
+                        'Object': object_key,
+                        'Size': size,
+                        'Event': event_name,
+                        'EventTime': event_time
+                    })
 
-Step 7: Configure S3 Trigger
-Step 8: Test
-Step 9: Verify DynamoDB
-Step 10: Monitor Logs`,
+        Step 7: Configure S3 Trigger
+        Step 8: Test
+        Step 9: Verify DynamoDB
+        Step 10: Monitor Logs`,
   },
   {
     id: "sns-sqs",
     title: "SNS and SQS",
-    content: `1) SNS — Create Topic & Send to Email
+    content: `
+    1) SNS — Create Topic & Send to Email
+      Step 1: SNS → Topics → Create topic
+              Type: Standard | Name: MyEmailTopic
+      Step 2: Create subscription → Protocol: Email → Enter email
+      Step 3: Confirm Subscription (check inbox)
+      Step 4: Publish message → Subject: Test Mail | Message: Hello SNS test
 
-Step 1: SNS → Topics → Create topic
-        Type: Standard | Name: MyEmailTopic
-Step 2: Create subscription → Protocol: Email → Enter email
-Step 3: Confirm Subscription (check inbox)
-Step 4: Publish message → Subject: Test Mail | Message: Hello SNS test
+      ──────────
 
-──────────
+      S3 → SNS → Email Flow
 
-S3 → SNS → Email Flow
-
-Step 1: Create S3 Bucket → my-upload-bucket-2026
-Step 2: Create SNS Topic → S3UploadNotification
-Step 3: SNS Access Policy (allow S3 to publish):
-{
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": { "Service": "s3.amazonaws.com" },
-    "Action": "sns:Publish",
-    "Resource": "arn:aws:sns:us-east-1:ACCOUNT:MyEmailTopic",
-    "Condition": {
-      "StringEquals": { "aws:SourceAccount": "ACCOUNT_ID" },
-      "ArnLike": { "aws:SourceArn": "arn:aws:s3:::my-upload-bucket-2026" }
-    }
-  }]
-}
-Step 4: Properties → S3 Event Notification → All object create → SNS
-Step 5: Test — Upload file → receive email
-
-──────────
-
-2) SQS
-
-Step 1: Create Queue → Name: MyQueue | Type: Standard
-Step 2: Send Message → "Hello this is SQS test message"
-Step 3: Poll for messages → View message
-
-──────────
-
-3) S3 → SNS → SQS → Lambda
-
-Architecture: S3 → SNS → SQS → Lambda
-
-Step 1:  Create S3 Bucket → mys3eventbucket123
-Step 2:  Create SNS Topic → MyS3SNSTopic
-Step 3:  Create SQS Queue → MyS3Queue
-Step 4:  Subscribe SQS to SNS (Protocol: SQS)
-Step 5:  Add SQS Access Policy (allow SNS to send)
-    {
-      "Statement": [
-          {
+      Step 1: Create S3 Bucket → my-upload-bucket-2026
+      Step 2: Create SNS Topic → S3UploadNotification
+      Step 3: SNS Access Policy (allow S3 to publish):
+      {
+        "Statement": [{
           "Effect": "Allow",
-          "Principal": {
-              "Service": "sns.amazonaws.com"
-          },
-          "Action": "sqs:SendMessage",
-          "Resource": "SQS ARN",
+          "Principal": { "Service": "s3.amazonaws.com" },
+          "Action": "sns:Publish",
+          "Resource": "arn:aws:sns:us-east-1:ACCOUNT:MyEmailTopic",
           "Condition": {
-              "ArnEquals": {
-              "aws:SourceArn": "SNS ARN"
-              }
+            "StringEquals": { "aws:SourceAccount": "ACCOUNT_ID" },
+            "ArnLike": { "aws:SourceArn": "arn:aws:s3:::my-upload-bucket-2026" }
           }
+        }]
+      }
+      Step 4: Properties → S3 Event Notification → All object create → SNS
+      Step 5: Test — Upload file → receive email
+
+      ──────────
+
+      2) SQS
+
+      Step 1: Create Queue → Name: MyQueue | Type: Standard
+      Step 2: Send Message → "Hello this is SQS test message"
+      Step 3: Poll for messages → View message
+
+      ──────────
+
+      3) S3 → SNS → SQS → Lambda
+
+      Architecture: S3 → SNS → SQS → Lambda
+
+      Step 1:  Create S3 Bucket → mys3eventbucket123
+      Step 2:  Create SNS Topic → MyS3SNSTopic
+      Step 3:  Create SQS Queue → MyS3Queue
+      Step 4:  Subscribe SQS to SNS (Protocol: SQS)
+      Step 5:  Add SQS Access Policy (allow SNS to send)
+          {
+            "Statement": [
+                {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "sns.amazonaws.com"
+                },
+                "Action": "sqs:SendMessage",
+                "Resource": "SQS ARN",
+                "Condition": {
+                    "ArnEquals": {
+                    "aws:SourceArn": "SNS ARN"
+                    }
+                }
+                }
+            ]
           }
-      ]
-    }
-Step 6:  Add SNS Access Policy (allow S3 to publish)
-Step 7:  Configure S3 Event → All object create → SNS
-Step 8:  Test: Upload to S3 → SNS → SQS
-Step 9:  Verify in SQS → Poll messages
-Step 10: Lambda Consumer:
-  def lambda_handler(event, context):
-      for record in event['Records']:
-          print("Message received from SQS:")
-          print(record['body'])
-      return {'statusCode': 200, 'body': 'Message processed'}`,
+      Step 6:  Add SNS Access Policy (allow S3 to publish)
+      Step 7:  Configure S3 Event → All object create → SNS
+      Step 8:  Test: Upload to S3 → SNS → SQS
+      Step 9:  Verify in SQS → Poll messages
+      Step 10: Lambda Consumer:
+        def lambda_handler(event, context):
+            for record in event['Records']:
+                print("Message received from SQS:")
+                print(record['body'])
+            return {'statusCode': 200, 'body': 'Message processed'}`,
   },
   {
     id: "elb",
