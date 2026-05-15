@@ -46,101 +46,94 @@ const CC_SECTIONS = [
     title: "EC2",
     content: 
     `
-      1. Windows:
-        → Create an EC2 
-        → Select Windows
-        → Click on connect 
-        → RDP Client 
-        → Download Remote Desktop
-        → Get password 
-        → decrypt 
-        → paste in administrator
-        Connect and administrator terminal will open
+      a) Connect using PuTTY (.ppk):
+        Step 1: Create an EC2 with a key pair of .ppk, copy the IP of it.
+        Step 2: Open PuTTY, paste the IP.
+        Step 3: Left side: Connection → SSH → Auth → Credentials
+                Browse the .ppk file and click Open.
+        Step 4: If Linux → login as: ec2-user
+                If Ubuntu → login as: ubuntu
+                Test: whoami
 
-      2. Putty:
-        → Create instance with key-pair ".ppk"
-        → Connect 
-        → EC2 instance connect
-        → Open Putty
-        → Paste IPV4 in hostname
-        → Left terminal 
-          → SSH 
-            → Auth 
-              → Credential
-        → Upload .ppk file 
-        → Click Open 
-        → Login as username: xxxxx
+      ──────────
 
-      3. Puttygen:
-        → Open PuTTYgen 
-        → Click Load
-        → Change file type to All Files (.)
-        → Select your .pem file 
-        → Click Save private key 
-        → Save as .ppk
-        → Open Putty 
-        → Host: ec2-user@IP 
-        → Repeat Putty process
+      b) Convert .pem to .ppk (PuTTYGen):
+        Step 1: Open PuTTYGen
+        Step 2: Click Load → change file type to All Files (*)
+        Step 3: Select your .pem file
+        Step 4: Click Save private key → save as .ppk
+        Step 5: Follow same process as (a) above with the .ppk
+
+      ──────────
+
+      c) RDP (Windows EC2):
+        Step 1: Create an EC2 → in security groups add RDP in the custom TCP
+                Select OS: Windows
+        Step 2: Click on Connect → RDP client → click Get Password
+                Upload the .pem file to decrypt the password
+        Step 3: Click the Windows symbol and search RDP
+                Paste the IP of the EC2
+        Step 4: Login as: Administrator
+                Password: decrypted password
+        Step 5: A new system (Windows desktop) will open
     `,
   },
   {
     id: "ebs",
-    title: "EBS",
+    title: "EBS — Volumes & Snapshots",
     content: 
     `
-      PHASE 1
-        Creating and Attaching an EBS Volume: 
-          Step 1: 
-            Create EC2 instance with t2.micro
-          Step 2: 
-            EC2 Dashboard 
-              → Volumes 
-                → Create Volume
-                  Type: gp3 
-                  Size: 20 GiB
-                  Same AZ as EC2
-          Step 3: 
-            Attach Volume 
-              → Actions 
-                → Attach Volume
-                  Device name: /dev/xvdd
-          Step 4: 
-            Verify inside EC2 → lsblk
-      PHASE 2
-        Step 5: 
-          sudo fdisk /dev/xvdd 
-            → Inside fdisk: 
-              n 
-              p 
-              Enter 
-              Enter 
-              Enter 
-              w
-          sudo partprobe
-        Step 6: 
-          lsblk
-        Step 7: 
-          sudo mkfs.xfs /dev/xvdd1
-        Step 8: 
-          sudo mkdir /mnt/ebsdata
-        Step 9: 
-          sudo mount /dev/xvdf1 /mnt/ebsdata 
-            → Verify: 
-              df -h
-        Step 10: 
-          cd /mnt/ebsdata && sudo touch testfile.txt && ls
-      PHASE 3
-        Step 11: 
-          sudo blkid /dev/xvdd1
-        Step 12: 
-          sudo nano /etc/fstab
-            Add: UUID=xxxx... /mnt/ebsdata xfs defaults,nofail 0 0
-        Step 13: 
-          sudo mount -a
-        Step 14: 
-          sudo reboot 
-          → Reconnect 
-          → df -h
+      PART A — Attach a Volume
+        Step 1: Create an EC2, note the Availability Zone (AZ).
+        Step 2: Create a Volume with the SAME AZ, any size.
+        Step 3: Attach volume to running EC2
+                  Actions → Attach Volume
+                  Device name: /dev/sdf
+        Step 4: Open EC2 console and run: lsblk
+
+      ──────────
+
+      PART B — Format and Mount the Volume
+        (After attaching, connect to EC2 and run:)
+
+        sudo su
+        lsblk -fs
+        fdisk /dev/nvme1n1       ← enter: m, n, p, Enter, Enter, Enter, w
+        lsblk
+        mkfs.xfs /dev/nvme1n1p1
+        mkdir /mnt/vish
+        mount /dev/nvme1n1p1 /mnt/vish
+        df -h
+        blkid /dev/nvme1n1p1    ← COPY UUID
+
+        nano /etc/fstab
+        (add at the last line:)
+        UUID=<UUID-value>   /mnt/vish   xfs   defaults,nofail   0   0
+
+        mount -a
+        reboot → reconnect → check: df -h
+
+      ──────────
+
+      PART C — Move Volume to Another EC2
+        Step 1: Create another EC2 in the SAME AZ.
+        Step 2: Detach the volume from old EC2.
+        Step 3: Attach to new EC2.
+        Step 4: Connect to new EC2 and run:
+
+        sudo su
+        mkdir /mnt/vish
+        mount /dev/nvme1n1p1 /mnt/vish
+        lsblk -fs
+
+      ──────────
+
+      PART D — Snapshots
+        Step 1: Select the volume → Actions → Create Snapshot.
+        Step 2: Snapshots section → Copy Snapshot → select another region.
+        Step 3: Switch to that region → select snapshot → Actions → Create Volume.
+        Step 4: Attach an EC2 in that region to the created volume (same AZ).
+                Run: lsblk   (to verify)
     `,
   },
   {
@@ -148,54 +141,79 @@ const CC_SECTIONS = [
     title: "EFS",
     content: 
     `
-      1. Create Security Group
-        Inbound: SSH 
-                  → Anywhere 
-                    | NFS 
-                        → Anywhere
-      2. Create EFS 
-        → Add Security Group
-      3. Create 2 EC2 instances 
-        → Attach same Security Group
-      4. Run on both EC2 instances:
-        sudo yum install -y amazon-efs-utils
-        sudo mkdir /efs
-        sudo mount -t efs <EFS-ID>:/ /efs
-      5. Permanent Mount:
-        <EFS-ID>:/ /efs efs defaults,_netdev 0 0
-        EC2-1:
-          cd /efs && echo "hello EC2-2" > /efs/test.txt
-        EC2-2:
-          cat /efs/test.txt`,
+      Step 1: Create 2 EC2 instances with 2 DIFFERENT availability zones.
+              Include NFS in the custom TCP inbound rule of their security group.
+      Step 2: Create a new security group (named NFS) and attach it to the EFS.
+      Step 3: Create an EFS with only 2 availability zones (matching the EC2s).
+      Step 4: Open consoles of BOTH EC2 instances.
+      Step 5: Run the following commands on BOTH EC2s:
+
+        sudo su
+        mkdir efs
+        yum install -y amazon-efs-utils
+        (connect EFS via DNS:)
+          EFS → Connect → DNS → paste the mount command in console
+
+        cd efs
+
+      Step 6: On EC2-1:
+        nano h.txt   ← put any text and save
+
+      Step 7: On EC2-2:
+        cat h.txt    ← the file appears here (shared filesystem)
+
+      Note: Both EC2s share the same EFS, so files written on one
+            are instantly visible on the other.
+    `,
   },
   {
     id: "s3",
     title: "S3",
     content: 
     `
-      1. Create Bucket
-        Bucket Policy:
-        {
-          "Version": "2012-10-17",
-          "Statement": [{
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::YOUR_BUCKET_NAME/*"
-          }]
-        }
+      a) Public Access to S3 Object
+        Step 1: Create an S3 bucket, allow ACLs under Object Ownership.
+        Step 2: Block all public access → UNCHECK it (very important).
+        Step 3: Enable versioning (recommended).
+        Step 4: After creation:
+                Bucket → Permissions → ACL → Public Access → right side tick.
+        Step 5: Upload any image → click on it
+                Permissions → ACL → Public Access → left AND right tick.
+        Step 6: Properties → Copy link → open in incognito to verify.
 
-      2. Enable Versioning
+      ──────────
 
-      3. Cross Region Replication
-        Management → Create Replication
-        Destination: Another region | Role: LabRole
+      b) Versioning
+        Step 1: Enable versioning (compulsory).
+        Step 2: Upload a text file, modify it locally, upload again.
+        Step 3: Buckets → Objects → click "Show Versions"
+                → you can see both versions.
+        Step 4: Delete the latest version → old version still shows.
 
-      4. Static Website Hosting
-        Properties → Static Website Hosting → Enable
-        Upload: index.html, error.html
-        Go to each object and make them public through permissions → Object Ownership → ACLs enabled
+      ──────────
+
+      c) Cross Region Replication
+        Step 1: Create a 2nd bucket in a DIFFERENT region
+                (same process, versioning enabled).
+        Step 2: Go to 1st bucket → Management → Replication Rules.
+        Step 3: Status: Enable
+                Source: Apply to all objects
+                Destination: select the 2nd bucket
+                IAM Role: LabRole
+                Replicate existing objects: No
+        Step 4: Upload any file in bucket 1
+                → it automatically appears in bucket 2.
+
+      ──────────
+
+      d) Static Website Hosting
+        Step 1: Upload index.html and error.html following the
+                normal public access process (ACL settings enabled).
+        Step 2: Click on index.html → Permissions → Everyone → both ticks.
+                Do the same for error.html.
+        Step 3: Bucket → Properties → Static Website Hosting → Enable.
+                Enter: index.html as index document, error.html as error document.
+        Step 4: Copy the generated URL → open in browser.
     `,
   },
   {
@@ -203,111 +221,155 @@ const CC_SECTIONS = [
     title: "VPC",
     content: 
     `
-    Create VPC: CIDR 10.0.0.0/16
+      Step 1: Create a VPC — CIDR: 10.0.0.0/16
 
-    Subnets:
-      Public:  10.0.1.0/24
-      Private: 10.0.2.0/24
+      Step 2: Create Subnets:
+        Public:  AZ us-east-1a | Subnet CIDR: 10.0.1.0/24
+        Private: AZ us-east-1a | Subnet CIDR: 10.0.2.0/24
 
-    Internet Gateway: Create and Attach
+      Step 3: Create an Internet Gateway → Attach to the VPC.
 
-    Route Table:
-      Destination: 0.0.0.0/0
-      Attach Internet Gateway → Associate Public Subnet
+      Step 4: Create Route Tables:
+        PUBLIC Route Table:
+          Create → Actions → Edit Routes
+          Add Route: Destination: 0.0.0.0/0, Target: Internet Gateway (custom)
+          Actions → Edit Subnet Associations → add Public Subnet.
 
-    EC2 Security Groups:
-      Public:  SSH → Anywhere | HTTP → Anywhere
-      Private: SSH → Public SG
+        PRIVATE Route Table:
+          Create → Actions → Edit Subnet Associations → add Private Subnet.
 
-    Install Apache:
-      sudo yum install httpd -y
-      sudo systemctl start httpd && sudo systemctl enable httpd
-      echo "Public EC2 Live" | sudo tee /var/www/html/index.html
+      Step 5: Public Subnet → Actions → Edit Subnet Settings
+              → Enable Auto-assign public IPv4 address (tick).
 
-    Install Nginx:
-      sudo yum update -y
-      sudo yum install nginx -y
-      sudo systemctl start nginx && sudo systemctl enable nginx`,
+      Step 6: Create a Security Group (attach to the custom VPC):
+              Inbound rules: SSH, HTTP, HTTPS.
+
+      Step 7: Create EC2 for Public Subnet:
+              Edit Network → VPC (custom)
+              Subnet: public
+              Select existing security group: custom made.
+
+      Step 8: Create EC2 for Private Subnet (same process, select private subnet).
+
+      Step 9: Test connectivity:
+              Public subnet EC2 → will connect ✓
+              Private subnet EC2 → will NOT connect ✗ (no internet route)
+    `,
   },
   {
     id: "bastion",
-    title: "VPC Bastion",
+    title: "VPC Bastion Server",
     content: 
       `
-        Create Bastion EC2 → Connect using ssh -i
-        Transfer key (Outside Bastion):
-          scp -i "Key-pair.pem" Key-pair.pem ec2-user@IP:/home/ec2-user/
-        Inside Bastion:
-          chmod 400 Key-pair.pem
-          ssh -i Key-pair.pem ec2-user@PRIVATE_IP`,
+      (Follow same process as VPC Exp-5 until route tables are created, then continue:)
+
+      Step 1:  Allocate an Elastic IP.
+      Step 2:  Create a NAT Gateway:
+               Method of Elastic IP: Manual
+               Select the created Elastic IP.
+      Step 3:  Attach the NAT Gateway to the PRIVATE Route Table.
+      Step 4:  Create 2 EC2 instances — one for Public subnet, one for Private subnet.
+
+      Step 5:  Open a terminal where your .pem key is located.
+               SSH into the PUBLIC EC2:
+                 ssh -i "key.pem" ec2-user@<public-ip>
+
+      Step 6:  Open ANOTHER terminal and copy the key to the public EC2:
+                 scp -i yourkey.pem yourkey.pem ec2-user@<public-ip>:~
+
+      Step 7:  In Terminal 1 (inside public EC2), restrict key permissions:
+                 chmod 400 yourkey.pem
+
+      Step 8:  From Terminal 1 (inside public EC2), SSH into the PRIVATE EC2:
+                 ssh -i yourkey.pem ec2-user@<private-ip>
+
+      Step 9:  After connection success, verify internet access via NAT:
+                 ping google.com
+      `,
   },
   {
     id: "nat",
     title: "VPC NAT Gateway",
     content: `
-    1. Allocate Elastic IP
-    2. Create NAT Gateway
-    3. Create Private Route Table
-    4. Test:
-      ping -c 3 google.com`,
+      Note: NAT Gateway is part of the Bastion Server experiment.
+            Refer to "VPC Bastion Server" for full setup steps.
+
+      Summary:
+      Step 1: Allocate Elastic IP.
+      Step 2: Create NAT Gateway → attach to Public Subnet → assign Elastic IP.
+      Step 3: Edit Private Route Table:
+              Add Route: 0.0.0.0/0 → Target: NAT Gateway.
+      Step 4: SSH into private EC2 via bastion (public EC2).
+      Step 5: Test internet access:
+                ping google.com   ← should succeed via NAT`,
   },
   {
     id: "lambda",
-    title: "AWS Lambda",
-    content: `Lambda Function
+    title: "AWS Lambda + S3-DynamoDB Integration",
+    content: `
+      PART A — Basic Lambda Function
 
-        Step 1: Open AWS Lambda → Search Lambda → Open dashboard
-        Step 2: Create function → Select "Author from scratch"
+        Step 1: Open AWS Lambda → Create function
+        Step 2: Select "Author from scratch"
         Step 3: Name: MyFirstLambda | Runtime: Python 3.x
         Step 4: Role → Select LabRole
         Step 5: Code:
 
-        def lambda_handler(event, context):
-            return "Hello AWS Lambda"
+          def lambda_handler(event, context):
+              return "Hello AWS Lambda"
 
-        Step 6: Deploy & Test
+        Step 6: Click Deploy → Test
 
-        ──────────────────────────────────────────────
+      ──────────
 
-        Add S3 Trigger to Lambda
+      PART B — S3 → DynamoDB via Lambda
 
-        Step 1: Login to AWS Console
-        Step 2: Create S3 Bucket → s3-lambda-demo123
-        Step 3: Create DynamoDB Table
-                Table name: newtable | Partition key: unique (String)
-        Step 4: Create Lambda Function
-                Name: S3ToDynamoDB | Runtime: Python 3.x
-                Permissions: Create new role with basic Lambda permissions
-        Step 5: Attach permissions → Configuration → Permissions
-                AmazonS3FullAccess, AmazonDynamoDBFullAccess, CloudWatchLogsFullAccess
-        Step 6: Lambda Code:
+        Step 1: Create an S3 bucket normally.
+        Step 2: Create a DynamoDB table:
+                Table name: (any name, e.g. s3-events-table)
+                Partition key: id   (String)
+        Step 3: Create a Lambda function:
+                Author from scratch
+                Role: LabRole
+                Runtime: Python 3.x
+        Step 4: Add trigger to Lambda:
+                Trigger config: Select S3 → select the bucket.
+        Step 5: Lambda code:
 
-        import boto3
-        from uuid import uuid4
+          import boto3
+          from uuid import uuid4
 
-        def lambda_handler(event, context):
-            dynamodb = boto3.resource('dynamodb')
-            if 'Records' in event:
-                for record in event['Records']:
-                    bucket_name = record['s3']['bucket']['name']
-                    object_key  = record['s3']['object']['key']
-                    size        = record['s3']['object'].get('size', -1)
-                    event_name  = record.get('eventName', 'Unknown')
-                    event_time  = record.get('eventTime', 'Unknown')
-                    table = dynamodb.Table('newtable')
-                    table.put_item(Item={
-                        'unique': str(uuid4()),
-                        'Bucket': bucket_name,
-                        'Object': object_key,
-                        'Size': size,
-                        'Event': event_name,
-                        'EventTime': event_time
-                    })
+          def lambda_handler(event, context):
+              s3 = boto3.client("s3")
+              dynamodb = boto3.resource('dynamodb')
 
-        Step 7: Configure S3 Trigger
-        Step 8: Test
-        Step 9: Verify DynamoDB
-        Step 10: Monitor Logs`,
+              if 'Records' in event:
+                  for record in event['Records']:
+                      bucket_name = record['s3']['bucket']['name']
+                      object_key  = record['s3']['object']['key']
+                      size        = record['s3']['object'].get('size', -1)
+                      event_name  = record.get('eventName', 'Unknown')
+                      event_time  = record.get('eventTime', 'Unknown')
+
+                      dynamoTable = dynamodb.Table('table-name')
+                      dynamoTable.put_item(
+                          Item={
+                              'id': str(uuid4()),
+                              'Bucket': bucket_name,
+                              'Object': object_key,
+                              'Size': size,
+                              'Event': event_name,
+                              'EventTime': event_time
+                          })
+              else:
+                  print("No 'Records' key found in the event.")
+
+        Step 6: Click Deploy.
+        Step 7: Upload something to the S3 bucket.
+        Step 8: Go to DynamoDB → Explore Items → click Run.
+                You should see the uploaded file's metadata as a new record.
+        Step 9: In Lambda → Monitor → View CloudWatch Logs (to show logs if asked).
+    `,
   },
   {
     id: "sns-sqs",
@@ -443,92 +505,123 @@ PART 13-15 — Verify & Test
   {
     id: "beanstalk",
     title: "Elastic Beanstalk",
-    content: `Step 1: Login → AWS Academy → Learner Lab
-Step 2: All Services → Compute → Elastic Beanstalk
-Step 3: Create Application → Name: beanstalk-app
-Step 4: Platform: Node.js
-Step 5: Upload application code
-        ZIP Structure (must be from inside project folder):
-          package.json
-          server.js
-        cd beanstalk-app && zip -r app.zip .
-        Upload: app.zip
-Step 6: Environment Type: Web server environment
-        Instance Type: t2.micro (important — other types may fail)
-Step 7: Click Create → Wait 5-7 minutes
-        AWS will: Create EC2, Install Node.js, Deploy app
-Step 8: Access URL:
-        http://beanstalk-app-env.eba-xxxxx.ap-south-1.elasticbeanstalk.com
-        Expected: Hello from AWS Elastic Beanstalk!`,
+    content: `
+      Step 1: Login → AWS Academy → Learner Lab → Open Console.
+      Step 2: All Services → Compute → Elastic Beanstalk.
+      Step 3: Create Application → Enter a name.
+      Step 4: Create Environment → Web server environment.
+      Step 5: Platform: Tomcat.
+      Step 6: Upload application code (WAR file):
+              Download sample WAR from:
+              https://tomcat.apache.org/tomcat-6.0-doc/appdev/sample/
+              Upload the .war file.
+      Step 7: Configure:
+              Role: LabRole
+              Key pair: select existing
+              Network: VPC (default)
+              Subnets: select
+              Enable public IP: yes
+              Instance type: t2.micro   ← important, other types may fail
+              Type: Load Balancer | Min: 1 | Max: 2
+      Step 8: Create → wait 5–7 minutes.
+              AWS will: provision EC2, install Tomcat, deploy the WAR app.
+      Step 9: Open the provided domain URL → you should see the sample app.
+      Step 10: To redeploy:
+               Upload & Deploy → upload same WAR with a different version label
+               → open URL again to verify new deployment.
+    `,
   },
   {
     id: "lex",
     title: "Amazon Lex",
-    content: `Amazon Lex – Hotel Booking Bot
+    content: `
+      Step 1: Open Lex → Create bot → Name (everything default).
 
-Step 1: Search Amazon Lex → Click Create bot
-Step 2: Create blank bot
-        Name: HotelBookingBot | IAM: Create new role | Language: English
-Step 3: Create Intent → Name: BookHotel
-Step 4: Sample Utterances:
-        "I want to book a hotel" | "Book a room" | "Reserve hotel" | "I need a room"
-Step 5: Slots:
-  Slot 1 — age (AMAZON.Number)  Prompt: "What is your age?"
-           Condition: if {age} < 18 → "You are not eligible"
-  Slot 2 — location (AMAZON.City)  Prompt: "Which city?"
-  Slot 3 — checkin (AMAZON.Date)  Prompt: "Check-in date?"
-  Slot 4 — nights (AMAZON.Number) Prompt: "How many nights?"
-Step 6: Custom Slot Type → RoomType
-        Values: Single | Double | Suite
-Step 7: Add buttons in prompt card: Single | Double | Suite
-Step 8: Responses:
-        Initial: "Welcome to Hotel Booking! What is your name?"
-        Confirmation: "Confirm booking in {location} for {nights} nights?"
-Step 9: Build and Test
+      Step 2: Intent → Create → Name it (e.g. BookHotel).
+              Add utterances:
+                "I want to book a hotel"
+                "Book a room"
+                "Reserve hotel"
+                "I need a room"
 
-Sample conversation:
-  User: Book a hotel  →  Bot: What is your age?
-  User: 25            →  Bot: Which city?
-  User: Hyderabad     →  Bot: Check-in date?
-  User: Tomorrow      →  Bot: Nights?
-  User: 2             →  Bot: Select room type
-  User: Double        →  Bot: Confirm booking?
-  User: Yes           →  Bot: Booking confirmed`,
+      Step 3: Create Slots:
+        Slot 1 — age (AMAZON.Number)
+                 Prompt: "What is your age?"
+                 Advanced → Branch:
+                   if {age} < 18 → message: "You are not eligible"
+
+        Slot 2 — city (AMAZON.City)
+                 Prompt: "Which city would you like to book in?"
+
+        Slot 3 — date (AMAZON.Date)
+                 Prompt: "What is your check-in date?"
+
+        Slot 4 — nights (AMAZON.Number)
+                 Prompt: "How many nights will you stay?"
+
+      Step 4: Create Custom Slot Type for Room:
+              Slot types → Add slot type → Add blank slot type
+              Name: RoomType
+              Values: single, double, suite
+
+      Step 5: Add Slot — RoomType
+              Advanced → Slot prompts → More prompt options
+              → Add → Add card groups → add buttons (Single / Double / Suite).
+
+      Step 6: Initial Response:
+              "Welcome to Hotel Booking! What is your name?"
+
+      Step 7: Confirmation prompt:
+              "Do you want to confirm booking in {city} for {nights} nights?"
+
+      Step 8: Build → Test.
+
+      Sample Conversation:
+        User: Book a hotel    → Bot: What is your age?
+        User: 25              → Bot: Which city?
+        User: Hyderabad       → Bot: Check-in date?
+        User: Tomorrow        → Bot: How many nights?
+        User: 2               → Bot: Select room type (buttons shown)
+        User: Double          → Bot: Confirm booking in Hyderabad for 2 nights?
+        User: Yes             → Bot: Booking confirmed!
+    `,
   },
   {
     id: "iam",
     title: "IAM",
     content: 
     `
-      Part A: GUI Access (Management Console)
-        Step 1:  Login as Root User
-        Step 2:  Search IAM → Security, Identity, & Compliance
-        Step 3:  Users → Create user
-        Step 4:  Username: S3_Specialist
-                Enable: "Provide user access to the AWS Management Console"
-                Set custom password
-        Step 5:  Attach policies directly → AmazonS3FullAccess
-        Step 6:  Review → Create → Download .csv (contains password + sign-in URL)
-        Step 7:  Copy 12-digit Account ID → Sign out
+      Part A — GUI Access (Management Console)
+        Step 1:  IAM → Users → Create user
+        Step 2:  Username: (any, e.g. S3_Specialist)
+                 Tick: "Provide user access to the AWS Management Console"
+                 Set a custom password.
+        Step 3:  Attach policies directly → AmazonS3FullAccess
+        Step 4:  Review → Create → Download .csv
+                 (contains password + sign-in URL)
+        Step 5:  Copy 12-digit Account ID → Sign out.
 
-        Verification (IAM User Login):
-        Step 8:  Open Sign-in URL from .csv
-        Step 9:  Enter: Account ID | Username | Password
-        Step 10: Test 1 (Fail): Go to EC2 → Access Denied
-                Test 2 (Pass): Go to S3 → Create bucket → Works
+        Verification (Login as IAM User):
+        Step 6:  Open sign-in URL from .csv.
+        Step 7:  Enter: Account ID | Username | Password.
+        Step 8:  Test 1 (Fail): Go to EC2 → Access Denied ✗
+                 Test 2 (Pass): Go to S3 → Create bucket → Works ✓
 
-        ──────────
+      ──────────
 
-        Part B: CLI Access (Programmatic)
+      Part B — CLI Access (Programmatic)
 
         Step 1:  Login as Admin → IAM → Users → Select user
         Step 2:  Security credentials → Access keys → Create access key
         Step 3:  Select: Command Line Interface (CLI)
         Step 4:  Download .csv (Access Key ID + Secret Access Key)
-        Step 5:  Install AWS CLI
-        Step 6:  Open Terminal → Run: aws configure
-        Step 7:  Enter: Access Key ID, Secret Access Key
-                Default region: ap-south-1 | Default output: json
+        Step 5:  Open Terminal → Run:
+                   aws configure
+        Step 6:  Enter:
+                   Access Key ID:     (from .csv)
+                   Secret Access Key: (from .csv)
+                   Default region:    ap-south-1
+                   Default output:    json
 
         Verification:
           aws s3 ls              → Lists S3 buckets ✓
