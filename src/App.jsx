@@ -141,29 +141,132 @@ const CC_SECTIONS = [
     title: "EFS",
     content: 
     `
-      Step 1: Create 2 EC2 instances with 2 DIFFERENT availability zones.
-              Include NFS in the custom TCP inbound rule of their security group.
-      Step 2: Create a new security group (named NFS) and attach it to the EFS.
-      Step 3: Create an EFS with only 2 availability zones (matching the EC2s).
-      Step 4: Open consoles of BOTH EC2 instances.
-      Step 5: Run the following commands on BOTH EC2s:
+      PART 1: CREATE SECURITY GROUP
 
-        sudo su
-        mkdir efs
-        yum install -y amazon-efs-utils
-        (connect EFS via DNS:)
-          EFS → Connect → DNS → paste the mount command in console
+        Step 1.1: Go to Security Groups
+          EC2 → Security Groups → Create security group
 
-        cd efs
+        Step 1.2: Basic details
+          Name:        efs-sg
+          Description: Security group for EFS and EC2
+          VPC:         default
 
-      Step 6: On EC2-1:
-        nano h.txt   ← put any text and save
+        Step 1.3: Inbound rules
+          Rule 1 — SSH
+            Type:   SSH
+            Port:   22
+            Source: My IP
 
-      Step 7: On EC2-2:
-        cat h.txt    ← the file appears here (shared filesystem)
+          Rule 2 — NFS
+            Type:        NFS
+            Port:        2049
+            Source type: Security group
+            Source:      efs-sg
 
-      Note: Both EC2s share the same EFS, so files written on one
-            are instantly visible on the other.
+        Save the security group.
+
+      ──────────
+
+      PART 2: LAUNCH EC2 INSTANCES (2 INSTANCES)
+
+        EC2-1:
+          EC2 → Launch instance
+          Name:           EC2-1
+          AMI:            Amazon Linux
+          Instance type:  t2.micro
+          Key pair:       create/select one
+          Network:
+            VPC:    default
+            Subnet: AZ-1
+          Security group: Select existing → choose efs-sg
+          Launch
+
+        EC2-2:
+          Repeat same steps:
+          Name:           EC2-2
+          Subnet:         AZ-2
+          Security group: efs-sg
+          Launch
+
+        → Now you have 2 EC2 instances in different AZs.
+
+      ──────────
+
+      PART 3: CREATE EFS
+
+        Go to EFS → Create file system
+        Select:
+          VPC: default
+        Click Create
+
+        AWS will automatically:
+          - Create mount targets
+          - One per AZ
+
+      ──────────
+
+      PART 4: ATTACH SECURITY GROUP TO EFS
+
+        Open your EFS → Go to Network tab
+        For each mount target:
+          Edit → Attach efs-sg → Save
+
+      ──────────
+
+      PART 5: CONNECT (MOUNT) EFS ON EC2
+
+        Step 5.1: Login to EC2-1 (SSH in via terminal or EC2 Connect)
+
+        Step 5.2: Switch to root:
+          sudo su
+
+        Step 5.3: Install EFS utils:
+          sudo yum install -y amazon-efs-utils
+
+        Step 5.4: Create mount directory:
+          sudo mkdir /efs
+
+        Step 5.5: Mount EFS:
+          sudo mount -t efs <EFS-ID>:/ /efs
+          (Replace <EFS-ID> with your actual EFS ID, e.g. fs-0abc1234)
+
+        Step 5.6: Verify mount:
+          df -h
+          cd /efs
+
+        ── Repeat SAME steps (5.1–5.6) on EC2-2 ──
+
+      ──────────
+
+      PART 6: VERIFY SHARED FILESYSTEM
+
+        On EC2-1:
+          cd /efs
+          sudo nano h.txt
+          (type any text, e.g. "Hello from EC2-1", save with Ctrl+X → Y → Enter)
+
+        On EC2-2:
+          cd /efs
+          cat h.txt
+          → The file and content appear here (shared filesystem ✓)
+
+        Note: Both EC2s share the same EFS, so files written on one
+              are instantly visible on the other.
+
+      ──────────
+
+      PART 7: MAKE IT PERMANENT (Survive Reboots)
+
+        Run on BOTH EC2-1 and EC2-2:
+
+          sudo nano /etc/fstab
+
+        Add this line at the end of the file:
+          <EFS-ID>:/ /efs efs defaults,_netdev 0 0
+
+        Save and exit (Ctrl+X → Y → Enter), then verify:
+          sudo mount -a
+          df -h   ← /efs should appear in the list
     `,
   },
   {
