@@ -443,30 +443,36 @@ const CC_SECTIONS = [
           from uuid import uuid4
 
           def lambda_handler(event, context):
-              s3 = boto3.client("s3")
+
               dynamodb = boto3.resource('dynamodb')
 
               if 'Records' in event:
-                  for record in event['Records']:
-                      bucket_name = record['s3']['bucket']['name']
-                      object_key  = record['s3']['object']['key']
-                      size        = record['s3']['object'].get('size', -1)
-                      event_name  = record.get('eventName', 'Unknown')
-                      event_time  = record.get('eventTime', 'Unknown')
 
-                      dynamoTable = dynamodb.Table('table-name')
-                      dynamoTable.put_item(
+                  for record in event['Records']:
+
+                      bucket_name = record['s3']['bucket']['name']
+                      object_key = record['s3']['object']['key']
+                      size = record['s3']['object'].get('size', -1)
+                      event_name = record.get('eventName', 'Unknown')
+                      event_time = record.get('eventTime', 'Unknown')
+
+                      table = dynamodb.Table('newtable')
+
+                      table.put_item(
                           Item={
-                              'id': str(uuid4()),
+                              'unique': str(uuid4()),
                               'Bucket': bucket_name,
                               'Object': object_key,
                               'Size': size,
                               'Event': event_name,
                               'EventTime': event_time
-                          })
-              else:
-                  print("No 'Records' key found in the event.")
+                          }
+                      )
 
+              return {
+                  'statusCode': 200,
+                  'body': 'Data inserted into DynamoDB'
+              }
         Step 6: Click Deploy.
         Step 7: Upload something to the S3 bucket.
         Step 8: Go to DynamoDB → Explore Items → click Run.
