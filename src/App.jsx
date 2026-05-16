@@ -558,7 +558,17 @@ const CC_SECTIONS = [
             for record in event['Records']:
                 print("Message received from SQS:")
                 print(record['body'])
-            return {'statusCode': 200, 'body': 'Message processed'}`,
+            return {'statusCode': 200, 'body': 'Message processed'}
+            
+      add this in test : 
+      {
+        "Records": [
+          {
+            "body": "Hello from SQS"
+          }
+        ]
+      }
+            `,
   },
   {
     id: "elb",
